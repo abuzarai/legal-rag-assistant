@@ -1,0 +1,55 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.log
+
+# --- Env files ---
+.env
+.env.*
+!*.example
+
+# --- Secrets / Credentials ---
+service_account.json
+service_account*.json
+service-account*.json
+*credentials*.json
+gcp-*.json
+*.pem
+*.p12
+*.key
+
+# --- Test / scratch scripts ---
+test_gemini.py
+drive_test.py
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+remove/
+
+# --- Scripts ---
+scripts/
+
+# --- UV & Build caches ---
+.uv-cache/
+.uv-python/
+
+# --- OS / Editor ---
+.DS_Store
+.idea/
+.vscode/
+
+# --- Artifacts / Local Data ---
+artifacts/
+data/
+uvicorn.log
+
+# --- Python build outputs ---
+build/
+dist/
+*.egg-info/
+
+# --- Logs ---
+logs/
+*.log
