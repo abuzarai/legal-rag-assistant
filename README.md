@@ -91,7 +91,8 @@ Google Drive (PDFs, TXTs)
 
 ---
 
-## 🔌 API Reference
+<details>
+<summary>API Reference</summary>
 
 ### `GET /query`
 
@@ -150,6 +151,8 @@ Re-registers the Drive webhook channel (channels expire after 7 days).
 ### `GET /docs`
 
 **Response:** `{"documents": ["filename1.json", "filename2.json", ...]}` — lists all processed JSON snapshots.
+
+</details>
 
 ---
 
