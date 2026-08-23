@@ -1,5 +1,6 @@
 import os
 import re
+from src.common.config import get_gemini_api_key
 from typing import Iterable
 from pathlib import PurePosixPath
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -14,12 +15,23 @@ MAX_SOCIAL_REPLY_CHARS = 280
 
 
 # -------------------------------------------------------
-# Gemini Initialization via Vertex AI (ADC)
+# Gemini Initialization: API key preferred, Vertex AI (ADC) fallback
 # -------------------------------------------------------
 def get_llm():
+    api_key = get_gemini_api_key()
+    if api_key:
+        logger.info("[GEMINI] Using Gemini API key authentication")
+        return ChatGoogleGenerativeAI(
+            model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+            google_api_key=api_key,
+            temperature=0.2,
+        )
+
     project = os.getenv("GOOGLE_CLOUD_PROJECT")
     if not project:
-        raise RuntimeError("Missing GOOGLE_CLOUD_PROJECT for Vertex AI Gemini.")
+        raise RuntimeError(
+            "Missing Gemini credentials: set GEMINI_API_KEY (or GOOGLE_CLOUD_PROJECT for Vertex AI)."
+        )
     location = os.getenv("GOOGLE_VERTEX_LOCATION", "us-central1")
 
     logger.info("[GEMINI] Using Vertex AI authentication")

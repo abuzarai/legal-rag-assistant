@@ -19,9 +19,32 @@ _collection = None
 def get_embeddings() -> GoogleGenerativeAIEmbeddings:
     global _embeddings
     if _embeddings is None:
+        from src.common.config import (
+            get_embedding_model,
+            get_embedding_output_dims,
+            get_gemini_api_key,
+        )
+
+        dims = get_embedding_output_dims()
+        api_key = get_gemini_api_key()
+        if api_key:
+            logger.info(
+                "Loading Gemini API embeddings (%s, dims=%s)...",
+                get_embedding_model(),
+                dims,
+            )
+            _embeddings = GoogleGenerativeAIEmbeddings(
+                model=get_embedding_model(),
+                google_api_key=api_key,
+                output_dimensionality=dims,
+            )
+            return _embeddings
+
         project = os.getenv("GOOGLE_CLOUD_PROJECT")
         if not project:
-            raise RuntimeError("Missing GOOGLE_CLOUD_PROJECT for Vertex AI embeddings.")
+            raise RuntimeError(
+                "Missing Gemini credentials: set GEMINI_API_KEY (or GOOGLE_CLOUD_PROJECT for Vertex AI)."
+            )
         location = os.getenv("GOOGLE_VERTEX_LOCATION", "us-central1")
         logger.info("Loading Vertex AI embeddings for Weaviate queries...")
         _embeddings = GoogleGenerativeAIEmbeddings(
@@ -29,6 +52,7 @@ def get_embeddings() -> GoogleGenerativeAIEmbeddings:
             project=project,
             location=location,
             vertexai=True,
+            output_dimensionality=dims,
         )
     return _embeddings
 

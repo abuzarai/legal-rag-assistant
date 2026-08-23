@@ -9,10 +9,21 @@ def get_env(key: str, default=None):
 
 def get_gemini_api_key() -> str | None:
     """
-    Used ONLY for local development.
-    Cloud Run uses ADC instead of API keys.
+    Gemini API (AI Studio) key. Preferred auth mode: free tier, no billing.
+    When unset, falls back to Vertex AI via ADC.
     """
     return get_env("GEMINI_API_KEY")
+
+
+def get_embedding_model() -> str:
+    return get_env("EMBEDDING_MODEL", "gemini-embedding-001")
+
+
+def get_embedding_output_dims() -> int | None:
+    """Output dimensionality for gemini-embedding-* (default 768).
+    MUST match between ingestion and query time."""
+    raw = get_env("EMBEDDING_OUTPUT_DIMS")
+    return int(raw) if raw else 768
 
 
 # ---------------- Service Account Config ---------------- #
