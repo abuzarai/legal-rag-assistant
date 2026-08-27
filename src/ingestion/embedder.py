@@ -85,21 +85,44 @@ def _batch_embed(embedder, texts: list, dims: int = 768) -> list[list[float]]:
         return embedder.embed_documents(texts)
 
 
-def embed_with_retry(embedder, texts, max_retries=10):
+def embed_with_retry(embedder, texts, max_retries=8):
     delay = 3
+    transient_markers = [
+        "429",
+        "Resource has been exhausted",
+        "Temporary failure in name resolution",
+        "Name or service not known",
+        "Connection reset",
+        "Connection refused",
+        "timed out",
+        "Timeout",
+        "getaddrinfo",
+        "network is unreachable",
+        "[Errno -3]",
+        "[Errno 111]",
+        "[Errno 110]",
+    ]
     for attempt in range(max_retries):
         try:
             return _batch_embed(embedder, texts, dims=get_embedding_output_dims())
         except Exception as e:
-            if "429" in str(e) or "Resource has been exhausted" in str(e):
-                # Exponential backoff with jitter (3s → ~24min total)
-                wait = delay * (2**attempt) + random.uniform(0, 2)
-                logger.warning(
-                    f"[WARNING] Rate limited. Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})..."
-                )
+            msg = str(e)
+            if any(m in msg for m in transient_markers):
+                # Rate limits → aggressive backoff; DNS/conn blips → shorter,
+                # capped backoff so transient network flakes don't lose batches
+                if "429" in msg or "Resource has been exhausted" in msg:
+                    wait = delay * (2**attempt) + random.uniform(0, 2)
+                    logger.warning(
+                        f"[WARNING] Rate limited. Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})..."
+                    )
+                else:
+                    wait = min(2 + attempt * 2, 30) + random.uniform(0, 1)
+                    logger.warning(
+                        f"[WARNING] Transient network error, retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries}): {msg[:90]}"
+                    )
                 time.sleep(wait)
             else:
-                logger.error(f"[ERROR] Unexpected embedding error: {e}")
+                logger.error(f"[ERROR] Non-transient embedding error: {msg[:200]}")
                 return []
     logger.error(f"[ERROR] Failed to embed batch after {max_retries} retries.")
     return []
