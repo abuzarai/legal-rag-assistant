@@ -171,7 +171,7 @@ def _upload_batch(
         raise
 
 
-def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
+def upsert_chunks(docs, state, filepath, file_id=None, batch_size=32):
     if not docs:
         logger.warning(f"[WARNING] No documents to embed for {filepath}")
         return state
@@ -214,7 +214,7 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
             )
             # Delay between batches to avoid rate limiting
             if i + batch_size < len(chunks):
-                time.sleep(10)
+                time.sleep(3)
         except (RuntimeError, WeaviateBaseError) as exc:
             logger.error(f"[ERROR] Failed to upsert batch {i // batch_size + 1}: {exc}")
             break
