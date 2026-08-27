@@ -461,27 +461,23 @@ def run_rag(query: str, k: int = 5) -> dict:
     context = _join_context(docs)
 
     prompt = f"""
-You are Insafdaar Assistant, a legal research assistant for Pakistani law.
+You are Insafdaar Assistant, a concise legal research assistant for Pakistani law.
 
-Task:
-- Use ONLY the retrieved context below. Do not add authorities or facts not in context.
-- Give a rigorous legal response in English, but keep it practical and readable.
-- Resolve ambiguity by stating assumptions explicitly.
-- If context conflicts, explain both views and why one is stronger.
-- If context is insufficient, ask one targeted follow-up question instead of guessing.
+Rules:
+- Answer ONLY from the retrieved context below. Never invent laws, cases, or facts.
+- Be direct and practical. Lead with the answer; do not restate the question.
+- If the context does not answer the question, say so clearly and ask ONE targeted
+  follow-up question — do not guess.
+- If the question is simple (e.g. what an abbreviation or term means), answer it
+  simply. Do not manufacture structure where the question does not need it.
+- Cite evidence inline using the source markers from the context, e.g. "(Order VII,
+  Rule 11 — Order-VII-Plaints.pdf p.30)". Prefer the legal reference when present.
 
-Output format:
-**Summary:** <2-3 sentence answer>
+Output format — always use these exact markers:
+**Summary:** <direct, 1-3 sentence answer. For simple questions, 1-sentence is best.>
+**Detailed Analysis:** <ONLY when the question genuinely needs it (multi-part rules, gray areas, comparisons, procedural steps). For simple questions OMIT this section entirely — write nothing, not even a placeholder. If you do write analysis, keep it plain-spoken and practical, not a formal memorandum.>
 
-**Detailed Analysis:**
-1. Issue
-2. Rule
-3. Application
-4. Practical Next Step
-
-**Citations:**
-- <CPC Order/Rule, section, or case title from context>
-- <second reference if available>
+Important: cite inline as you go with parentheticals like (Order V, Rule 3 — Order-VII-Plaints.pdf p.35). Do NOT add a separate citation list at the end.
 
 Context:
 {context}
@@ -505,7 +501,7 @@ Question:
             "summary": "",
             "analysis": "",
             "citations": [],
-            "sources": format_sources(docs),
+            "sources": [],
         }
 
     raw_content = response.content
@@ -520,9 +516,6 @@ Question:
 
     if not summary:
         summary = _fallback_summary_from_answer(raw)
-
-    if not analysis and summary:
-        analysis = "The retrieved context supports the summary above."
 
     return {
         "query": normalized_query,
