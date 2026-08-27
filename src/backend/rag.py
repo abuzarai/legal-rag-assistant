@@ -422,6 +422,27 @@ def run_rag(query: str, k: int = 5) -> dict:
 
     docs = similarity_search(normalized_query, k=k)
 
+    # ── statute-first retrieval ──────────────────────────────────────────
+    # The corpus has two category types: the full CPC statute text
+    # (cpc-sections) and case-law PDFs (case-laws). We prefer the statute
+    # text when available — rule before its applications — so the model
+    # grounds on the code itself, then sees how courts applied it.
+    #
+    # Fetch k_s sections + k_c case laws (default 3+2), merged statute-first.
+    # If either category is empty, the missing side is simply skipped.
+    k_s = max(int(os.environ.get("RAG_STATUTE_CHUNKS", "3")), 1)
+    k_c = max(int(os.environ.get("RAG_CASELAW_CHUNKS", "2")), 0)
+    docs = []
+    if k_s:
+        docs += similarity_search(
+            normalized_query, k=k_s, category="cpc-sections", use_hybrid=True
+        )
+    if k_c:
+        docs += similarity_search(
+            normalized_query, k=k_c, category="case-laws", use_hybrid=True
+        )
+    # ── end statute-first ────────────────────────────────────────────────
+
     if is_retrieval_weak(docs):
         return {
             "query": normalized_query,

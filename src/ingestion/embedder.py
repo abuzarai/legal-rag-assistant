@@ -11,7 +11,7 @@ from weaviate.exceptions import WeaviateBaseError
 from weaviate.classes.data import DataObject
 from src.common.logger import get_logger
 from src.common.weaviate_client import get_weaviate_client, ensure_collection
-from src.common.config import get_weaviate_collection
+from src.common.config import get_weaviate_collection, get_embedding_output_dims
 
 load_dotenv(dotenv_path="./.env", override=True)
 logger = get_logger(__name__)
@@ -57,14 +57,43 @@ def get_embedder():
     )
 
 
-def embed_with_retry(embedder, texts, max_retries=5):
-    delay = 2
+def _batch_embed(embedder, texts: list, dims: int = 768) -> list[list[float]]:
+    """
+    Embed a list of texts via the Gemini batchEmbedContents endpoint.
+
+    langchain's embed_documents uses the single embed_content endpoint which
+    hits the free-tier per-request limit. batchEmbedContents accepts multiple
+    contents per request and works reliably (verified: 16 texts at once).
+    Falls back to embed_documents on any unexpected error.
+    """
+    client = getattr(embedder, "client", None)
+    model = getattr(embedder, "model", None)
+    if client is None or model is None:
+        return embedder.embed_documents(texts)
+
+    try:
+        result = client.models.batch_embed_contents(
+            model=f"models/{model}" if not str(model).startswith("models/") else str(model),
+            contents=[{"parts": [{"text": t}]} for t in texts],
+            config={
+                "outputDimensionality": dims,
+                "taskType": "RETRIEVAL_DOCUMENT",
+            },
+        )
+        return [list(e.values) for e in result.embeddings]
+    except Exception:
+        return embedder.embed_documents(texts)
+
+
+def embed_with_retry(embedder, texts, max_retries=10):
+    delay = 3
     for attempt in range(max_retries):
         try:
-            return embedder.embed_documents(texts)
+            return _batch_embed(embedder, texts, dims=get_embedding_output_dims())
         except Exception as e:
             if "429" in str(e) or "Resource has been exhausted" in str(e):
-                wait = delay * (2**attempt) + random.uniform(0, 1)
+                # Exponential backoff with jitter (3s → ~24min total)
+                wait = delay * (2**attempt) + random.uniform(0, 2)
                 logger.warning(
                     f"[WARNING] Rate limited. Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})..."
                 )
@@ -119,7 +148,7 @@ def _upload_batch(
         raise
 
 
-def upsert_chunks(docs, state, filepath, file_id=None, batch_size=32):
+def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
     if not docs:
         logger.warning(f"[WARNING] No documents to embed for {filepath}")
         return state
