@@ -85,8 +85,8 @@ def _batch_embed(embedder, texts: list, dims: int = 768) -> list[list[float]]:
         return embedder.embed_documents(texts)
 
 
-def embed_with_retry(embedder, texts, max_retries=8):
-    delay = 3
+def embed_with_retry(embedder, texts, max_retries=4):
+    delay = 5
     transient_markers = [
         "429",
         "Resource has been exhausted",
@@ -171,7 +171,7 @@ def _upload_batch(
         raise
 
 
-def upsert_chunks(docs, state, filepath, file_id=None, batch_size=32):
+def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
     if not docs:
         logger.warning(f"[WARNING] No documents to embed for {filepath}")
         return state
