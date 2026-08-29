@@ -142,6 +142,11 @@ def run_ingestion(root_folder_id: str | None = None):
         state = upsert_chunks(docs, state, local_path, file_id=f["id"])
         logger.info(f"[OK] {filename} → {out_json}")
 
+        # Persist state after EVERY file, not just at the end, so a
+        # killed/restarted run resumes from here instead of re-ingesting
+        # everything from scratch.
+        save_state(state)
+
     save_state(state)
     logger.info("[INGEST] Complete.")
 

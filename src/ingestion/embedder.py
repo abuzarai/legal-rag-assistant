@@ -2,6 +2,7 @@ import os
 import time
 import random
 import datetime
+import uuid
 from typing import List
 from dotenv import load_dotenv
 from langchain_core.documents import Document
@@ -160,8 +161,15 @@ def _upload_batch(
         # remove Nones
         properties = {k: v for k, v in properties.items() if v is not None}
 
+        # Deterministic UUID per chunk: hash of source+page+content so a
+        # re-run overwrites the same object instead of duplicating it.
+        # This makes ingestion idempotent — restarting mid-run never
+        # creates duplicates and never requires a purge.
+        chunk_id = f"{properties.get('source')}|{properties.get('page')}|{properties.get('content')}"
+        obj_uuid = uuid.uuid5(uuid.NAMESPACE_URL, chunk_id)
+
         # ✅ use DataObject instead of raw dict
-        objects.append(DataObject(properties=properties, vector=vector))
+        objects.append(DataObject(uuid=str(obj_uuid), properties=properties, vector=vector))
 
     try:
         collection.data.insert_many(objects)
@@ -212,9 +220,11 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
             logger.info(
                 f"[INFO] Uploaded batch {i // batch_size + 1} with {len(embeddings)} chunks"
             )
-            # Delay between batches to avoid rate limiting
+            # Delay between batches to avoid rate limiting. 20s keeps us
+            # under the per-minute ceiling (~5 batches/min) so we never
+            # burst-block and never waste requests on retries.
             if i + batch_size < len(chunks):
-                time.sleep(3)
+                time.sleep(20)
         except (RuntimeError, WeaviateBaseError) as exc:
             logger.error(f"[ERROR] Failed to upsert batch {i // batch_size + 1}: {exc}")
             break
