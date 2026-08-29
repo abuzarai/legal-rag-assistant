@@ -58,54 +58,14 @@ def get_embedder():
     )
 
 
-def _embedding_keys():
-    """Return the ordered list of Gemini API keys to try: primary + fallbacks.
-
-    Each key belongs to a separate AI Studio project, so each has its own
-    free-tier quota (1000 embeddings/day + per-minute RPM). Rotating on 429
-    lets us consume quota across projects instead of hammering one.
-    """
-    primary = os.getenv("GEMINI_API_KEY", "")
-    fallbacks = [
-        k.strip()
-        for k in os.getenv("GEMINI_API_KEY_FALLBACKS", "").split(",")
-        if k.strip()
-    ]
-    keys = [primary] + fallbacks
-    return [k for k in keys if k]
-
-
-def _make_client(api_key: str, dims: int):
-    from google import genai
-
-    client = genai.Client(api_key=api_key) if api_key else None
-    return client
-
-
-def _batch_embed_impl(client, model: str, texts: list, dims: int) -> list[list[float]]:
-    """Embed a list of texts in one request via google-genai embed_content.
-
-    google-genai's embed_content accepts a list of contents and returns one
-    embedding per content — it is the batch-capable call on the v2.x API.
-    """
-    result = client.models.embed_content(
-        model=f"models/{model}" if not str(model).startswith("models/") else str(model),
-        contents=[{"parts": [{"text": t}]} for t in texts],
-        config={
-            "outputDimensionality": dims,
-            "taskType": "RETRIEVAL_DOCUMENT",
-        },
-    )
-    return [list(e.values) for e in result.embeddings]
-
-
 def _batch_embed(embedder, texts: list, dims: int = 768) -> list[list[float]]:
     """
-    Embed a list of texts via the Gemini batchEmbedContents endpoint.
+    Embed a list of texts in one request via google-genai embed_content.
 
-    langchain's embed_documents uses the single embed_content endpoint which
-    hits the free-tier per-request limit. batchEmbedContents accepts multiple
-    contents per request and works reliably (verified: 16 texts at once).
+    langchain's embed_documents uses the single-content path which hits the
+    free-tier per-request limit. google-genai's embed_content accepts a list
+    of contents in one request and returns one embedding per content, which
+    stays under the per-minute ceiling for a typical batch.
     Falls back to embed_documents on any unexpected error.
     """
     client = getattr(embedder, "client", None)
@@ -114,7 +74,19 @@ def _batch_embed(embedder, texts: list, dims: int = 768) -> list[list[float]]:
         return embedder.embed_documents(texts)
 
     try:
-        return _batch_embed_impl(client, model, texts, dims)
+        result = client.models.embed_content(
+            model=(
+                f"models/{model}"
+                if not str(model).startswith("models/")
+                else str(model)
+            ),
+            contents=[{"parts": [{"text": t}]} for t in texts],
+            config={
+                "outputDimensionality": dims,
+                "taskType": "RETRIEVAL_DOCUMENT",
+            },
+        )
+        return [list(e.values) for e in result.embeddings]
     except Exception:
         return embedder.embed_documents(texts)
 
@@ -136,45 +108,29 @@ def embed_with_retry(embedder, texts, max_retries=4):
         "[Errno 111]",
         "[Errno 110]",
     ]
-    keys = _embedding_keys()
-    model = getattr(embedder, "model", None)
-    dims = get_embedding_output_dims()
-
-    # Rotate across all available keys on each attempt. Each key is a
-    # separate AI Studio project with its own free-tier quota, so a 429 on
-    # one project can be served by the next without waiting for a reset.
     for attempt in range(max_retries):
-        for idx, key in enumerate(keys):
-            try:
-                client = _make_client(key, dims)
-                if client is None:
-                    continue
-                result = _batch_embed_impl(client, model, texts, dims)
-                return result
-            except Exception as e:
-                msg = str(e)
-                is_transient = any(m in msg for m in transient_markers)
-                if not is_transient:
-                    logger.error(f"[ERROR] Non-transient embedding error: {msg[:200]}")
-                    return []
-                if len(keys) > 1:
+        try:
+            return _batch_embed(embedder, texts, dims=get_embedding_output_dims())
+        except Exception as e:
+            msg = str(e)
+            if any(m in msg for m in transient_markers):
+                # Rate limits → exponential backoff + jitter; DNS/conn blips
+                # → short capped backoff so transient flakes don't lose batches
+                if "429" in msg or "Resource has been exhausted" in msg:
+                    wait = delay * (2**attempt) + random.uniform(0, 2)
                     logger.warning(
-                        f"[WARNING] Key {idx + 1}/{len(keys)} {msg[:50]}... rotating to next key"
+                        f"[WARNING] Rate limited. Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})..."
                     )
-                # Last key in this pass → sleep before next round
-                if idx == len(keys) - 1:
-                    if "429" in msg or "Resource has been exhausted" in msg:
-                        wait = delay * (2**attempt) + random.uniform(0, 2)
-                        logger.warning(
-                            f"[WARNING] All keys rate limited. Backing off {wait:.1f}s (round {attempt + 1}/{max_retries})..."
-                        )
-                    else:
-                        wait = min(2 + attempt * 2, 30) + random.uniform(0, 1)
-                        logger.warning(
-                            f"[WARNING] Transient network error, backing off {wait:.1f}s (round {attempt + 1}/{max_retries}): {msg[:90]}"
-                        )
-                    time.sleep(wait)
-    logger.error(f"[ERROR] Failed to embed batch after {max_retries} rounds across {len(keys)} keys.")
+                else:
+                    wait = min(2 + attempt * 2, 30) + random.uniform(0, 1)
+                    logger.warning(
+                        f"[WARNING] Transient network error, retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries}): {msg[:90]}"
+                    )
+                time.sleep(wait)
+            else:
+                logger.error(f"[ERROR] Non-transient embedding error: {msg[:200]}")
+                return []
+    logger.error(f"[ERROR] Failed to embed batch after {max_retries} retries.")
     return []
 
 
