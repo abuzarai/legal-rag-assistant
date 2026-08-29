@@ -214,10 +214,14 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
 
         embeddings = embed_with_retry(embedder, texts)
         if not embeddings:
+            # Fail fast: if even one batch can't embed, the API is throttled
+            # and the rest of this file won't either. Abort the file (state
+            # saves on completion, so it will resume on the next run) instead
+            # of cycling every batch through expensive backoff for hours.
             logger.warning(
-                f"[WARNING] Skipping batch {i // batch_size + 1}; embedding failed."
+                f"[WARNING] Batch {i // batch_size + 1} failed to embed; aborting file to save quota. Will resume next run."
             )
-            continue
+            break
 
         try:
             _upload_batch(client, collection_name, batch, embeddings)
