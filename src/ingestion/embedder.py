@@ -108,11 +108,24 @@ def embed_with_retry(embedder, texts, max_retries=4):
         "[Errno 111]",
         "[Errno 110]",
     ]
+    # The daily free-tier quota is NOT going to recover in 5-40s. If we see
+    # the per-day quota violated, stop immediately with a clear message
+    # instead of grinding retries that only burn more of tomorrow's budget.
+    quota_exhausted_markers = [
+        "EmbedContentRequestsPerDay",
+        "you exceeded your current quota",
+    ]
     for attempt in range(max_retries):
         try:
             return _batch_embed(embedder, texts, dims=get_embedding_output_dims())
         except Exception as e:
             msg = str(e)
+            msg_lower = msg.lower()
+            if any(m in msg_lower for m in quota_exhausted_markers):
+                raise QuotaExhaustedError(
+                    "Daily embedding quota exhausted (free tier). "
+                    "Run again after midnight UTC; progress resumes from state."
+                ) from e
             if any(m in msg for m in transient_markers):
                 # Rate limits → exponential backoff + jitter; DNS/conn blips
                 # → short capped backoff so transient flakes don't lose batches
@@ -132,6 +145,10 @@ def embed_with_retry(embedder, texts, max_retries=4):
                 return []
     logger.error(f"[ERROR] Failed to embed batch after {max_retries} retries.")
     return []
+
+
+class QuotaExhaustedError(Exception):
+    """Daily free-tier embedding quota is used up for today."""
 
 
 def _prepare_metadata(chunk: Document, filepath: str, file_id: str | None) -> dict:
@@ -184,7 +201,7 @@ def _upload_batch(
         raise
 
 
-def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
+def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4):
     if not docs:
         logger.warning(f"[WARNING] No documents to embed for {filepath}")
         return state
@@ -222,7 +239,6 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
                 f"[WARNING] Batch {i // batch_size + 1} failed to embed; aborting file to save quota. Will resume next run."
             )
             break
-
         try:
             _upload_batch(client, collection_name, batch, embeddings)
             total_inserted += len(embeddings)
@@ -230,10 +246,20 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=16):
                 f"[INFO] Uploaded batch {i // batch_size + 1} with {len(embeddings)} chunks"
             )
             # Delay between batches to avoid rate limiting. 20s keeps us
-            # under the per-minute ceiling (~5 batches/min) so we never
+            # under the per-minute ceiling (~3 batches/min) so we never
             # burst-block and never waste requests on retries.
             if i + batch_size < len(chunks):
                 time.sleep(20)
+        except QuotaExhaustedError as qe:
+            # Daily free-tier budget is gone for today. Stop the whole run
+            # now, persist what we have, and report clearly — resuming is
+            # just re-running the same command later.
+            logger.error(f"[STOP] {qe}")
+            try:
+                client.close()
+            except Exception:
+                pass
+            raise
         except (RuntimeError, WeaviateBaseError) as exc:
             logger.error(f"[ERROR] Failed to upsert batch {i // batch_size + 1}: {exc}")
             break

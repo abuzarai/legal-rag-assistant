@@ -154,8 +154,18 @@ def run_ingestion(root_folder_id: str | None = None):
 
 
 if __name__ == "__main__":
-    run_ingestion()
+    from src.ingestion.embedder import QuotaExhaustedError
+
     try:
-        get_weaviate_client().close()
-    except Exception:
-        pass
+        run_ingestion()
+        print("\n[DONE] Ingestion complete — all eligible files are in the vector store.")
+    except QuotaExhaustedError as qe:
+        # Graceful: state was saved per-file, so re-running resumes.
+        print("\n[QUOTA] " + str(qe))
+        print("[QUOTA] Nothing was lost — already-stored chunks are kept, and re-running this script resumes from where it stopped.")
+        raise SystemExit(3)
+    finally:
+        try:
+            get_weaviate_client().close()
+        except Exception:
+            pass
