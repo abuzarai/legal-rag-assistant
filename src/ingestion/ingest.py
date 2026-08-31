@@ -1,27 +1,28 @@
 import os
 import threading
-from src.ingestion.drive_fetcher import (
-    get_drive_service,
-    list_files_recursive,
-    download_file,
-)
-from src.ingestion.text_extractor import extract_text_from_pdf, extract_text_from_txt
-from src.ingestion.to_json import save_as_json
-from src.ingestion.state_manager import (
-    load_state,
-    save_state,
-    decide_processing,
-    update_state,
-    compute_file_hash,
-)
-from src.ingestion.embedder import upsert_chunks
-from src.common.weaviate_client import get_weaviate_client
+
 from src.common.config import (
     get_drive_allowed_exts,
     get_drive_root_folder_id,
     get_embedding_model,
 )
 from src.common.logger import get_logger
+from src.common.weaviate_client import get_weaviate_client
+from src.ingestion.drive_fetcher import (
+    download_file,
+    get_drive_service,
+    list_files_recursive,
+)
+from src.ingestion.embedder import upsert_chunks
+from src.ingestion.state_manager import (
+    compute_file_hash,
+    decide_processing,
+    load_state,
+    save_state,
+    update_state,
+)
+from src.ingestion.text_extractor import extract_text_from_pdf, extract_text_from_txt
+from src.ingestion.to_json import save_as_json
 
 logger = get_logger(__name__)
 

@@ -1,13 +1,11 @@
-from fastapi.testclient import TestClient
-from langchain_core.documents import Document
-
 import os
+
+from fastapi.testclient import TestClient
 
 os.environ.setdefault("INTERNAL_API_KEY", "test-internal-key")
 
-from src.backend.main import app
 from src.backend import main as backend_main
-
+from src.backend.main import app
 
 AUTH = {"x-internal-key": os.environ["INTERNAL_API_KEY"]}
 client = TestClient(app)

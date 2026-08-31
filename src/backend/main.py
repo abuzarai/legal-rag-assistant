@@ -1,12 +1,12 @@
-import os
 import glob
-from fastapi import FastAPI, Query, HTTPException, Depends
+import os
 
 # --------------------------------------------------------------
 # Local development: load .env
 # Cloud Run: ENV=prod → .env is NOT loaded
 # --------------------------------------------------------------
 from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Query
 
 ENV = os.getenv("ENV", "local")
 
@@ -21,14 +21,14 @@ if ENV == "local":
 # App + Routers
 # --------------------------------------------------------------
 
-from src.backend.rag import run_rag
-from src.common.logger import get_logger
-from src.common.config import get_drive_root_folder_id
-from src.ingestion.ingest import run_ingestion, IngestBusyError
-from src.ingestion.embedder import QuotaExhaustedError
 from src.backend.auth import require_internal_key
-from src.backend.drive_watcher import router as drive_router
 from src.backend.drive_watch_refresh import router as refresh_router
+from src.backend.drive_watcher import router as drive_router
+from src.backend.rag import run_rag
+from src.common.config import get_drive_root_folder_id
+from src.common.logger import get_logger
+from src.ingestion.embedder import QuotaExhaustedError
+from src.ingestion.ingest import IngestBusyError, run_ingestion
 
 logger = get_logger(__name__)
 app = FastAPI(

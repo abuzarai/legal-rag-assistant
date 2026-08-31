@@ -1,14 +1,15 @@
 # src/backend/deps.py
 
-from typing import List, Optional
 import os
+
 import numpy as np
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from weaviate.classes.query import Filter as WeaviateFilter
-from src.common.logger import get_logger
-from src.common.weaviate_client import get_weaviate_client, ensure_collection
+
 from src.common.config import get_weaviate_collection
+from src.common.logger import get_logger
+from src.common.weaviate_client import ensure_collection, get_weaviate_client
 
 logger = get_logger(__name__)
 
@@ -71,7 +72,7 @@ def get_collection():
 
 
 # ---------------------- Utility: Reranker ----------------------
-def rerank_results(query_vector: List[float], docs: List[Document]) -> List[Document]:
+def rerank_results(query_vector: list[float], docs: list[Document]) -> list[Document]:
     """
     Re-rank retrieved documents by cosine similarity between
     query and doc vectors. Requires vectors from Weaviate metadata.
@@ -97,10 +98,10 @@ def rerank_results(query_vector: List[float], docs: List[Document]) -> List[Docu
 def similarity_search(
     query: str,
     k: int = 5,
-    category: Optional[str] = None,
+    category: str | None = None,
     use_hybrid: bool = True,
     rerank: bool = True,
-) -> List[Document]:
+) -> list[Document]:
     """
     Perform semantic/hybrid search in Weaviate with optional reranking and filtering.
     """
@@ -124,7 +125,7 @@ def similarity_search(
             limit=max(k * 3, 10),  # get more for reranking
             filters=where_filter,
             return_properties=["content", "source", "page", "drive_id"],
-            return_metadata=["distance"],  # request raw vector
+            return_metadata=["distance", "vector"],  # vector lets the local reranker work
         )
     else:
         logger.info(f"🔍 Running pure vector search for '{query}'...")
@@ -141,7 +142,7 @@ def similarity_search(
         logger.warning(f"[Weaviate] No results found for query: {query}")
         return []
 
-    docs: List[Document] = []
+    docs: list[Document] = []
     for obj in objects:
         props = obj.properties or {}
         content = props.get("content")

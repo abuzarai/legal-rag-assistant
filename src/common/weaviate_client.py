@@ -1,19 +1,20 @@
-import weaviate
-from typing import Optional
 from urllib.parse import urlparse
-from weaviate.exceptions import WeaviateBaseError
+
+import weaviate
 from weaviate.auth import AuthApiKey
-from weaviate.classes.config import Configure, Property, DataType
-from src.common.config import get_weaviate_settings, get_weaviate_collection
+from weaviate.classes.config import Configure, DataType, Property
+from weaviate.exceptions import WeaviateBaseError
+
+from src.common.config import get_weaviate_collection, get_weaviate_settings
 from src.common.logger import get_logger
 
 logger = get_logger(__name__)
 
-_client: Optional[weaviate.WeaviateClient] = None
+_client: weaviate.WeaviateClient | None = None
 
 
 # -------------------- Connection helpers --------------------
-def _build_headers(raw: Optional[dict]) -> Optional[dict]:
+def _build_headers(raw: dict | None) -> dict | None:
     """Drop None values from optional headers dict."""
     if not raw:
         return None
@@ -86,7 +87,7 @@ def get_weaviate_client() -> weaviate.WeaviateClient:
 
 
 # -------------------- Schema management --------------------
-def ensure_collection(client: Optional[weaviate.WeaviateClient] = None, collection_name: Optional[str] = None):
+def ensure_collection(client: weaviate.WeaviateClient | None = None, collection_name: str | None = None):
     """
     Ensure the Weaviate collection exists and contains the latest schema.
     Adds 'category' property if missing (safe migration).

@@ -1,23 +1,24 @@
-import os
-import time
-import random
 import datetime
+import os
+import random
+import time
 import uuid
-from typing import List
+
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from weaviate.exceptions import WeaviateBaseError
 from weaviate.classes.data import DataObject
 from weaviate.classes.query import Filter as WeaviateFilter
-from src.common.logger import get_logger
-from src.common.weaviate_client import get_weaviate_client, ensure_collection
+from weaviate.exceptions import WeaviateBaseError
+
 from src.common.config import (
-    get_weaviate_collection,
-    get_embedding_output_dims,
     get_embedding_model,
+    get_embedding_output_dims,
+    get_weaviate_collection,
 )
+from src.common.logger import get_logger
+from src.common.weaviate_client import ensure_collection, get_weaviate_client
 
 load_dotenv(dotenv_path="./.env", override=True)
 logger = get_logger(__name__)
@@ -166,7 +167,7 @@ def _prepare_metadata(chunk: Document, filepath: str, file_id: str | None) -> di
     return metadata
 
 
-def _upload_batch(client, collection_name: str, docs: List[Document], embeddings: List[List[float]]):
+def _upload_batch(client, collection_name: str, docs: list[Document], embeddings: list[list[float]]):
     """Upload a batch of document chunks and embeddings (v4 syntax)."""
     collection = client.collections.get(collection_name)
     logger.info(

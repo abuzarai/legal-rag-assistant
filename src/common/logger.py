@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 def get_logger(name: str):
     """Return a configured logger with colored console output."""
     logger = logging.getLogger(name)

@@ -1,8 +1,10 @@
-from fastapi import APIRouter
-from googleapiclient.discovery import build
-import google.auth
-from google.oauth2 import service_account
 import os
+
+import google.auth
+from fastapi import APIRouter
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+
 from src.common.logger import get_logger
 
 logger = get_logger(__name__)

@@ -1,16 +1,14 @@
-import os
 import io
+import os
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Set, Dict
 
 import google.auth
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
-from google.oauth2 import service_account
 
 from src.common.logger import get_logger
-
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "service_account.json")
@@ -25,8 +23,8 @@ class DriveFile:
     id: str
     name: str
     mime_type: str
-    md5_checksum: Optional[str]
-    modified_time: Optional[str]
+    md5_checksum: str | None
+    modified_time: str | None
     category: str
     relative_path: str
 
@@ -76,7 +74,7 @@ def _list_children(service, folder_id, page_token=None, drive_id=None):
     return service.files().list(**params).execute()
 
 
-def _entry_from_meta(meta: dict, path: Tuple[str, ...]) -> DriveFile:
+def _entry_from_meta(meta: dict, path: tuple[str, ...]) -> DriveFile:
     """Convert raw Drive file metadata into a DriveFile dataclass."""
     category = path[0] if path else "unclassified"
     relative_path = "/".join(path + (meta.get("name") or "",))
@@ -91,25 +89,25 @@ def _entry_from_meta(meta: dict, path: Tuple[str, ...]) -> DriveFile:
     )
 
 
-def _ext_and_mime_allowlists(allowed_exts: List[str]) -> tuple[Set[str], Set[str]]:
+def _ext_and_mime_allowlists(allowed_exts: list[str]) -> tuple[set[str], set[str]]:
     """
     Build allowlists for extensions and common MIME types that correspond to those
     extensions, so files without a proper suffix still pass if their mimeType matches.
     """
     ext_set = {e.lower().lstrip(".") for e in allowed_exts if e}
     # Minimal, safe mapping. Extend if you support more types.
-    mime_map: Dict[str, Set[str]] = {
+    mime_map: dict[str, set[str]] = {
         "pdf": {"application/pdf"},
         "txt": {"text/plain"},
         # add more as needed
     }
-    mime_set: Set[str] = set()
+    mime_set: set[str] = set()
     for ext in ext_set:
         mime_set |= mime_map.get(ext, set())
     return ext_set, mime_set
 
 
-def _maybe_add_file(meta: dict, path: Tuple[str, ...], allowed_exts: Set[str], allowed_mimes: Set[str], results: List[DriveFile]):
+def _maybe_add_file(meta: dict, path: tuple[str, ...], allowed_exts: set[str], allowed_mimes: set[str], results: list[DriveFile]):
     """
     Add a file if it matches by extension OR by mimeType.
     This fixes the case where Drive filenames lack a .pdf suffix but have application/pdf mime.
@@ -135,9 +133,9 @@ def _maybe_add_file(meta: dict, path: Tuple[str, ...], allowed_exts: Set[str], a
 def list_files_recursive(
     service,
     root_folder_id: str,
-    allowed_exts: List[str],
-    drive_id: Optional[str] = None,
-) -> List[dict]:
+    allowed_exts: list[str],
+    drive_id: str | None = None,
+) -> list[dict]:
     """
     Return normalized metadata for all matching files under the root folder.
     Traverses all nested subfolders recursively (BFS).
@@ -147,7 +145,7 @@ def list_files_recursive(
 
     dq = deque([(root_folder_id, tuple())])
     visited_folders = set()
-    results: List[DriveFile] = []
+    results: list[DriveFile] = []
 
     logger.info(f"[DRIVE] Starting recursive scan from root folder: {root_folder_id}")
 

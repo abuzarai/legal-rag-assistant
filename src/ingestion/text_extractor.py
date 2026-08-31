@@ -1,5 +1,7 @@
 import os
+
 from langchain_community.document_loaders import PyPDFLoader
+
 
 def extract_text_from_txt(txt_path):
     with open(txt_path, 'r', encoding='utf-8', errors='ignore') as f:

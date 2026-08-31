@@ -3,8 +3,9 @@ import json
 import os
 import time
 
-from fastapi import APIRouter, Request, BackgroundTasks, HTTPException
-from src.ingestion.ingest import run_ingestion, IngestBusyError
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+
+from src.ingestion.ingest import IngestBusyError, run_ingestion
 
 router = APIRouter()
 

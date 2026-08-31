@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 
 def save_as_json(data, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
