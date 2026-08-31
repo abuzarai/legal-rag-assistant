@@ -1,7 +1,7 @@
 import os
 import json
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from src.common.logger import get_logger
 from src.common.config import get_state_backend, get_gcs_state_config
 
@@ -38,6 +38,7 @@ def _gcs_client_blob():
     blob = bucket_obj.blob(blob_path)
     return blob
 
+
 def load_state() -> dict:
     backend = get_state_backend()
     if backend == "gcs":
@@ -55,6 +56,7 @@ def load_state() -> dict:
     # default: file
     return _load_state_file()
 
+
 def save_state(state: dict) -> None:
     backend = get_state_backend()
     if backend == "gcs":
@@ -68,6 +70,7 @@ def save_state(state: dict) -> None:
             return
     _save_state_file(state)
 
+
 def compute_file_hash(filepath):
     hasher = hashlib.md5()
     with open(filepath, "rb") as f:
@@ -75,32 +78,64 @@ def compute_file_hash(filepath):
             hasher.update(chunk)
     return hasher.hexdigest()
 
-def needs_processing(state, filepath):
-    """Check if file needs re-processing based on hash."""
-    new_hash = compute_file_hash(filepath)
-    old_entry = state.get(filepath)
 
-    if not old_entry:
-        logger.info(f"[STATE] {filepath} is new → will process.")
-        return True, new_hash
+def _lookup_entry(state: dict, file_id: str, local_path: str):
+    """State is keyed by Drive file id (stable across renames/paths).
 
-    old_hash = old_entry.get("hash")
-    if old_hash != new_hash:
-        logger.info(f"[STATE] {filepath} hash changed → will reprocess.")
-        return True, new_hash
+    Legacy state files keyed by local path (sometimes Windows-style with
+    backslashes, or old folder names) never match the current layout, which
+    forced a full re-ingest on every run. Migrate those entries here: adopt
+    the entry under the file id and drop the stale path key.
+    """
+    if file_id in state:
+        return state[file_id]
+    if isinstance(state.get(local_path), dict):
+        entry = state.pop(local_path, None)
+        state[file_id] = entry
+        return entry
+    # fall back to scanning by stored file_id (path keys may differ entirely)
+    for key, entry in list(state.items()):
+        if isinstance(entry, dict) and entry.get("file_id") == file_id:
+            state.pop(key, None)
+            state[file_id] = entry
+            return entry
+    return None
 
-    logger.info(f"[STATE] {filepath} unchanged → skipping.")
-    return False, new_hash
 
-def update_state(state, filepath, file_id, new_hash, embedding_model=None, embedding_done=False):
-    state[filepath] = {
+def decide_processing(state: dict, file_id: str, drive_md5, local_path: str) -> str:
+    """Decide what a file needs without downloading anything first.
+
+    Returns 'skip' (unchanged + already embedded), 'download' (new or changed
+    remote content) or 'embed' (content already local, embeddings incomplete).
+    """
+    entry = _lookup_entry(state, file_id, local_path)
+    if entry is None:
+        return "download"
+
+    entry_md5 = entry.get("drive_md5")
+    if entry_md5 and drive_md5:
+        if entry_md5 != drive_md5:
+            return "download"  # remote content changed
+        if entry.get("embeddings", {}).get("done"):
+            return "skip"
+        return "embed"  # interrupted run; reuse the local file
+
+    # No drive-md5 baseline (legacy entry): fetch to compare content.
+    return "download"
+
+
+def update_state(state: dict, file_id: str, local_path: str, new_hash: str,
+                 drive_md5=None, embedding_model=None, embedding_done=False) -> dict:
+    state[file_id] = {
         "file_id": file_id,
+        "local_path": local_path,
         "hash": new_hash,
-        "last_processed": datetime.utcnow().isoformat(),
+        "drive_md5": drive_md5,
+        "last_processed": datetime.now(timezone.utc).isoformat(),
         "embeddings": {
             "model": embedding_model or "pending",
             "done": embedding_done,
-            "last_embedded": None if not embedding_done else datetime.utcnow().isoformat()
-        }
+            "last_embedded": None if not embedding_done else datetime.now(timezone.utc).isoformat(),
+        },
     }
     return state

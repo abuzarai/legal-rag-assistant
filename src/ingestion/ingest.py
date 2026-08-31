@@ -1,4 +1,5 @@
 import os
+import threading
 from src.ingestion.drive_fetcher import (
     get_drive_service,
     list_files_recursive,
@@ -9,28 +10,29 @@ from src.ingestion.to_json import save_as_json
 from src.ingestion.state_manager import (
     load_state,
     save_state,
-    needs_processing,
+    decide_processing,
     update_state,
+    compute_file_hash,
 )
 from src.ingestion.embedder import upsert_chunks
 from src.common.weaviate_client import get_weaviate_client
-from src.common.config import get_drive_allowed_exts, get_drive_root_folder_id
+from src.common.config import (
+    get_drive_allowed_exts,
+    get_drive_root_folder_id,
+    get_embedding_model,
+)
 from src.common.logger import get_logger
 
 logger = get_logger(__name__)
 
-# -------------------------------------------------------------------
-# Ensure state entries always have the required structure
-# -------------------------------------------------------------------
-def ensure_state_entry(state, local_path):
-    if local_path not in state:
-        state[local_path] = {}
+# Every ingestion trigger (HTTP /ingest, drive-events, scheduler) funnels
+# through run_ingestion, which holds a single non-blocking process-wide lock —
+# concurrent runs would otherwise race on state and double-embed.
+_ingest_lock = threading.Lock()
 
-    state[local_path].setdefault("downloaded", False)
-    state[local_path].setdefault("extracted", False)
-    state[local_path].setdefault("embeddings", {"done": False})
 
-    return state
+class IngestBusyError(Exception):
+    """Raised when an ingestion is already running in this process."""
 
 
 # -------------------------------------------------------------------
@@ -63,6 +65,9 @@ def _normalize_category(raw: str | None) -> str:
         "case-laws": "case-laws",
         "caselaws": "case-laws",
         "case law": "case-laws",
+        "case laws": "case-laws",
+        "cpc section": "cpc-sections",
+        "cpc sections": "cpc-sections",
     }
     return aliases.get(val, val)
 
@@ -71,6 +76,16 @@ def _normalize_category(raw: str | None) -> str:
 # Main Ingestion Pipeline
 # -------------------------------------------------------------------
 def run_ingestion(root_folder_id: str | None = None):
+    acquired = _ingest_lock.acquire(blocking=False)
+    if not acquired:
+        raise IngestBusyError("ingestion already running")
+    try:
+        _run_ingestion_locked(root_folder_id)
+    finally:
+        _ingest_lock.release()
+
+
+def _run_ingestion_locked(root_folder_id: str | None):
     root_id = root_folder_id or get_drive_root_folder_id()
     if not root_id:
         raise RuntimeError("DRIVE_ROOT_FOLDER_ID must be set.")
@@ -91,18 +106,22 @@ def run_ingestion(root_folder_id: str | None = None):
         rel_dir, filename, safe_relative_path = _build_paths(
             relative_path, f.get("name"), category
         )
+        file_id = str(f["id"])
+        drive_md5 = f.get("md5_checksum")
 
-        # Download PDF/TXT
         raw_dir = _local_dir("./data/raw_pdfs", rel_dir)
         os.makedirs(raw_dir, exist_ok=True)
-        local_path = download_file(service, f["id"], filename, raw_dir)
+        local_path = os.path.join(raw_dir, filename)
 
-        # State handling
-        state = ensure_state_entry(state, local_path)
-        process, file_hash = needs_processing(state, local_path)
-        if not process and state[local_path]["embeddings"]["done"]:
+        # Decide before any download: unchanged + embedded files are skipped
+        # using the Drive md5 from the scan (no bandwidth/quota spent).
+        decision = decide_processing(state, file_id, drive_md5, local_path)
+        if decision == "skip":
             logger.info(f"[SKIP] {filename} — unchanged, embeddings exist")
             continue
+
+        if decision == "download":
+            local_path = download_file(service, file_id, filename, raw_dir)
 
         ext = os.path.splitext(filename)[1].lower()
         if ext == ".pdf":
@@ -119,13 +138,15 @@ def run_ingestion(root_folder_id: str | None = None):
         out_json = os.path.join(json_dir, f"{filename}.json")
         save_as_json(extracted, out_json)
 
-        # Update state
+        # Update state (embedding not done yet)
+        file_hash = compute_file_hash(local_path)
         state = update_state(
             state,
+            file_id,
             local_path,
-            f["id"],
             file_hash,
-            embedding_model="gemini-embedding-001",
+            drive_md5=drive_md5,
+            embedding_model=get_embedding_model(),
             embedding_done=False,
         )
 
@@ -139,7 +160,7 @@ def run_ingestion(root_folder_id: str | None = None):
             docs.append(Document(page_content=page["page_content"], metadata=metadata))
 
         # Upsert embeddings
-        state = upsert_chunks(docs, state, local_path, file_id=f["id"])
+        state = upsert_chunks(docs, state, local_path, file_id=file_id, state_key=file_id)
         logger.info(f"[OK] {filename} → {out_json}")
 
         # Persist state after EVERY file, not just at the end, so a

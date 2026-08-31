@@ -10,9 +10,14 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from weaviate.exceptions import WeaviateBaseError
 from weaviate.classes.data import DataObject
+from weaviate.classes.query import Filter as WeaviateFilter
 from src.common.logger import get_logger
 from src.common.weaviate_client import get_weaviate_client, ensure_collection
-from src.common.config import get_weaviate_collection, get_embedding_output_dims
+from src.common.config import (
+    get_weaviate_collection,
+    get_embedding_output_dims,
+    get_embedding_model,
+)
 
 load_dotenv(dotenv_path="./.env", override=True)
 logger = get_logger(__name__)
@@ -161,10 +166,8 @@ def _prepare_metadata(chunk: Document, filepath: str, file_id: str | None) -> di
     return metadata
 
 
-def _upload_batch(
-    client, collection_name: str, docs: List[Document], embeddings: List[List[float]]
-):
-    """Upload a batch of document chunks and embeddings (v4 syntax, fixed)."""
+def _upload_batch(client, collection_name: str, docs: List[Document], embeddings: List[List[float]]):
+    """Upload a batch of document chunks and embeddings (v4 syntax)."""
     collection = client.collections.get(collection_name)
     logger.info(
         f"[INFO] Uploading {len(docs)} chunks to collection '{collection_name}'..."
@@ -185,23 +188,18 @@ def _upload_batch(
 
         # Deterministic UUID per chunk: hash of source+page+content so a
         # re-run overwrites the same object instead of duplicating it.
-        # This makes ingestion idempotent — restarting mid-run never
-        # creates duplicates and never requires a purge.
         chunk_id = f"{properties.get('source')}|{properties.get('page')}|{properties.get('content')}"
-        obj_uuid = uuid.uuid5(uuid.NAMESPACE_URL, chunk_id)
+        obj_uuid = str(uuid.uuid5(uuid.NAMESPACE_URL, chunk_id))
 
-        # ✅ use DataObject instead of raw dict
-        objects.append(DataObject(uuid=str(obj_uuid), properties=properties, vector=vector))
+        objects.append(DataObject(uuid=obj_uuid, properties=properties, vector=vector))
 
-    try:
-        collection.data.insert_many(objects)
-        logger.info(f"[INFO] ✅ Uploaded {len(objects)} chunks successfully.")
-    except Exception as e:
-        logger.error(f"[ERROR] Failed to upload batch: {e}")
-        raise
+    collection.data.insert_many(objects)
+    logger.info(f"[INFO] ✅ Uploaded {len(objects)} chunks successfully.")
 
 
-def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4):
+def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4, state_key=None):
+    state_key = state_key if state_key is not None else filepath
+
     if not docs:
         logger.warning(f"[WARNING] No documents to embed for {filepath}")
         return state
@@ -221,6 +219,25 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4):
     # Inject metadata (source + page)
     for chunk in chunks:
         chunk.metadata = _prepare_metadata(chunk, filepath, file_id)
+
+    # File-scoped upsert: this weaviate-client pin only supports batch delete
+    # by filter, and `source` is unique per file — so delete the file's old
+    # chunk set (also purging stale/renamed chunks) before inserting fresh
+    # ones. Deterministic UUIDs keep inserts idempotent on crash-retry.
+    file_source = None
+    for chunk in chunks:
+        s = (chunk.metadata or {}).get("source")
+        if s:
+            file_source = s
+            break
+    if file_source:
+        try:
+            collection = client.collections.get(collection_name)
+            collection.data.delete_many(
+                where=WeaviateFilter.by_property("source").equal(file_source)
+            )
+        except Exception as e:
+            logger.warning(f"[WARN] Pre-insert delete for {file_source} failed (continuing): {e}")
 
     total_inserted = 0
 
@@ -255,20 +272,16 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4):
             # now, persist what we have, and report clearly — resuming is
             # just re-running the same command later.
             logger.error(f"[STOP] {qe}")
-            try:
-                client.close()
-            except Exception:
-                pass
             raise
         except (RuntimeError, WeaviateBaseError) as exc:
             logger.error(f"[ERROR] Failed to upsert batch {i // batch_size + 1}: {exc}")
             break
 
     if total_inserted:
-        embeds = state[filepath].setdefault("embeddings", {})
+        embeds = state[state_key].setdefault("embeddings", {})
         embeds["done"] = True
-        embeds["last_embedded"] = datetime.datetime.utcnow().isoformat()
-        embeds["model"] = "text-embedding-005"
+        embeds["last_embedded"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        embeds["model"] = get_embedding_model()
         embeds["vector_store"] = "weaviate"
         embeds["collection"] = collection_name
         logger.info(
@@ -277,10 +290,6 @@ def upsert_chunks(docs, state, filepath, file_id=None, batch_size=4):
     else:
         logger.warning(f"[WARNING] No chunks stored for {filepath}.")
 
-    # Close connection cleanly
-    try:
-        client.close()
-    except Exception:
-        pass
-
+    # Never close the shared client here: it is also used by live /query
+    # requests, and closing it mid-flight drops concurrent retrievals.
     return state
