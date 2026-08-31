@@ -50,7 +50,7 @@ def list_docs():
 
 # ---------------------------- RAG Query --------------------------- #
 @app.get("/query")
-def query_api(q: str = Query(...), k: int = 5):
+def query_api(q: str = Query(...), k: int = Query(5, ge=1, le=10)):
     return run_rag(q, k)
 
 # ---------------------------- Manual Ingestion --------------------------- #

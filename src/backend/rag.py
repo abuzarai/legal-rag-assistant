@@ -420,8 +420,6 @@ def run_rag(query: str, k: int = 5) -> dict:
             "sources": [],
         }
 
-    docs = similarity_search(normalized_query, k=k)
-
     # ── statute-first retrieval ──────────────────────────────────────────
     # The corpus has two category types: the full CPC statute text
     # (cpc-sections) and case-law PDFs (case-laws). We prefer the statute
