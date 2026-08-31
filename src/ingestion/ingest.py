@@ -5,9 +5,11 @@ from src.common.config import (
     get_drive_allowed_exts,
     get_drive_root_folder_id,
     get_embedding_model,
+    get_weaviate_collection,
 )
 from src.common.logger import get_logger
 from src.common.weaviate_client import get_weaviate_client
+from weaviate.classes.query import Filter as WeaviateFilter
 from src.ingestion.drive_fetcher import (
     download_file,
     get_drive_service,
@@ -73,6 +75,34 @@ def _normalize_category(raw: str | None) -> str:
     return aliases.get(val, val)
 
 
+def _tombstone_removed_files(state: dict, current_files: list) -> dict:
+    """Delete chunks (and state entries) for files absent from the Drive scan."""
+    current_ids = {str(f["id"]) for f in current_files}
+    client = get_weaviate_client()
+    collection = client.collections.get(get_weaviate_collection())
+    removed = 0
+
+    for key, entry in list(state.items()):
+        if not isinstance(entry, dict) or not entry.get("file_id"):
+            continue
+        fid = str(entry["file_id"])
+        if fid in current_ids:
+            continue
+        logger.warning(f"[TOMBSTONE] {fid} is no longer on Drive; deleting its chunks.")
+        try:
+            collection.data.delete_many(
+                where=WeaviateFilter.by_property("drive_id").equal(fid)
+            )
+            removed += 1
+        except Exception as e:
+            logger.warning(f"[TOMBSTONE] Delete failed for {fid}: {e}")
+        state.pop(key, None)
+
+    if removed:
+        logger.info(f"[TOMBSTONE] Removed {removed} file(s) no longer on Drive.")
+    return state
+
+
 # -------------------------------------------------------------------
 # Main Ingestion Pipeline
 # -------------------------------------------------------------------
@@ -98,8 +128,20 @@ def _run_ingestion_locked(root_folder_id: str | None):
     allowed_exts = get_drive_allowed_exts()
 
     # Scan Drive
-    files = list_files_recursive(service, root_id, allowed_exts)
+    files, scan_complete = list_files_recursive(service, root_id, allowed_exts)
     logger.info(f"[INGEST] {len(files)} eligible files found.")
+
+    # Tombstone chunks whose source file disappeared from Drive (only when the
+    # scan is complete — a partial scan must never delete valid chunks). Keeps
+    # partial/duplicate copies of corpus text from clashing with the canonical
+    # version during retrieval.
+    if not scan_complete:
+        logger.warning("[INGEST] Drive scan incomplete; skipping tombstone check for removed files.")
+    else:
+        state = _tombstone_removed_files(state, files)
+        # Persist tombstones before any per-file work: a later crash must not
+        # resurrect records for files that no longer exist on Drive.
+        save_state(state)
 
     for f in files:
         relative_path = f.get("relative_path") or f.get("name")

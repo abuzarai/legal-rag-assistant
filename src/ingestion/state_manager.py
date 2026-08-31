@@ -119,7 +119,10 @@ def decide_processing(state: dict, file_id: str, drive_md5, local_path: str) -> 
             return "download"  # remote content changed
         if entry.get("embeddings", {}).get("done"):
             return "skip"
-        return "embed"  # interrupted run; reuse the local file
+        # Interrupted run: reuse the local file when it still exists; the raw
+        # corpus lives in an ephemeral container directory, so fetch a fresh
+        # copy when it is gone.
+        return "embed" if os.path.exists(local_path) else "download"
 
     # No drive-md5 baseline (legacy entry): fetch to compare content.
     return "download"

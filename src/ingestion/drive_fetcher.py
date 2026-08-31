@@ -135,10 +135,14 @@ def list_files_recursive(
     root_folder_id: str,
     allowed_exts: list[str],
     drive_id: str | None = None,
-) -> list[dict]:
+) -> tuple[list[dict], bool]:
     """
     Return normalized metadata for all matching files under the root folder.
     Traverses all nested subfolders recursively (BFS).
+
+    Returns (files, scan_complete): scan_complete is False when any folder
+    failed to list, so callers can avoid destructive actions (e.g. chunk
+    tombstones) on a partial scan.
     """
     allowed_ext_set, allowed_mime_set = _ext_and_mime_allowlists(allowed_exts)
     from collections import deque
@@ -146,6 +150,7 @@ def list_files_recursive(
     dq = deque([(root_folder_id, tuple())])
     visited_folders = set()
     results: list[DriveFile] = []
+    scan_errors = 0
 
     logger.info(f"[DRIVE] Starting recursive scan from root folder: {root_folder_id}")
 
@@ -161,6 +166,7 @@ def list_files_recursive(
                 resp = _list_children(service, folder_id, page_token, drive_id)
             except HttpError as exc:
                 logger.warning(f"[DRIVE] Failed to list folder {folder_id}: {exc}")
+                scan_errors += 1
                 break
 
             for item in resp.get("files", []):
@@ -177,8 +183,9 @@ def list_files_recursive(
             if not page_token:
                 break
 
+    scan_complete = scan_errors == 0
     logger.info(f"[DRIVE] Completed scan. Found {len(results)} eligible files.")
-    return [entry.__dict__ for entry in results]
+    return [entry.__dict__ for entry in results], scan_complete
 
 
 # --------------------------- Download --------------------------- #
@@ -207,7 +214,7 @@ if __name__ == "__main__":
     from src.common.config import get_drive_allowed_exts
 
     svc = get_drive_service()
-    files = list_files_recursive(svc, root_id, get_drive_allowed_exts())
+    files, scan_complete = list_files_recursive(svc, root_id, get_drive_allowed_exts())
     print(f"Found {len(files)} eligible files under root {root_id}.")
     for f in files[:20]:
         print(" -", f.get("category", "unclassified"), "|", f.get("relative_path"))

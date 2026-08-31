@@ -23,11 +23,25 @@ def test_download_when_drive_md5_changed():
     assert decide_processing(state, "file-1", "md5-B", "./data/raw_pdfs/cpc-sections/x.pdf") == "download"
 
 
-def test_embed_when_interrupted_embedding():
-    state = {}
-    state = update_state(state, "file-1", "./data/raw_pdfs/cpc-sections/x.pdf", "h1", drive_md5="md5-a", embedding_done=False)
-    # unchanged remote, embeddings not done -> reuse the local file
-    assert decide_processing(state, "file-1", "md5-a", "./data/raw_pdfs/cpc-sections/x.pdf") == "embed"
+def test_embed_when_interrupted_embedding(tmp_path):
+    p = tmp_path / "x.pdf"
+    p.write_bytes(b"x")
+    state = update_state({}, "file-1", str(p), "h1", drive_md5="md5-a", embedding_done=False)
+    # unchanged remote, embeddings not done, local file present -> reuse it
+    assert decide_processing(state, "file-1", "md5-a", str(p)) == "embed"
+
+
+def test_embed_requires_local_file_to_exist(tmp_path):
+    state = update_state({}, "file-1", "/nonexistent/x.pdf", "h1", drive_md5="md5-a", embedding_done=False)
+    # local file is gone (ephemeral container dir) -> download a fresh copy
+    assert decide_processing(state, "file-1", "md5-a", "/nonexistent/x.pdf") == "download"
+
+
+def test_embed_uses_local_file_when_present(tmp_path):
+    p = tmp_path / "x.pdf"
+    p.write_bytes(b"x")
+    state = update_state({}, "file-1", str(p), "h1", drive_md5="md5-a", embedding_done=False)
+    assert decide_processing(state, "file-1", "md5-a", str(p)) == "embed"
 
 
 def test_new_file_downloads():
