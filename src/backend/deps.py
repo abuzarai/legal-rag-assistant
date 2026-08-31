@@ -5,6 +5,7 @@ import os
 import numpy as np
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from weaviate.classes.query import Filter as WeaviateFilter
 from src.common.logger import get_logger
 from src.common.weaviate_client import get_weaviate_client, ensure_collection
 from src.common.config import get_weaviate_collection
@@ -108,13 +109,10 @@ def similarity_search(
     collection = get_collection()
 
     # --- optional filter by category ---
+    # Weaviate v4 requires a Filter object (v3-era dicts are rejected).
     where_filter = None
     if category:
-        where_filter = {
-            "path": ["category"],
-            "operator": "Equal",
-            "valueText": category,
-        }
+        where_filter = WeaviateFilter.by_property("category").equal(category)
 
     # --- Hybrid (BM25 + Vector) search ---
     if use_hybrid:
