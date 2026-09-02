@@ -3,7 +3,7 @@
 > Final Year Project, AI microservice · Part of the [Insafdaar](https://github.com/abuzarai/insafdaar-webapp) legal case management platform.  
 > A retrieval-augmented generation (RAG) service that answers legal questions grounded in Pakistani case law and CPC sections.
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-PolyForm_Noncommercial-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Weaviate](https://img.shields.io/badge/Weaviate-v4-5C3FFB?logo=weaviate&logoColor=white)](https://weaviate.io)
@@ -323,4 +323,4 @@ legal-rag-assistant/
 
 ## License
 
-Licensed under the [Apache License 2.0](LICENSE).
+Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Commercial use requires written permission from the author.
