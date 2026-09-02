@@ -85,7 +85,7 @@ jobs:
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
-          SSHCMD="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes ubuntu@$DEPLOY_HOST"
+          SSHCMD="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o ConnectTimeout=30 -o ServerAliveInterval=60 -o ServerAliveCountMax=10 ubuntu@$DEPLOY_HOST"
           # Gate on the source repo's HEAD: image ids change on every build
           # even when content is identical, so id-comparison re-ships large
           # images needlessly (the slow host chokes on the stream). A
@@ -96,7 +96,13 @@ jobs:
               webapp) local_sha=$(git -C insafdaar rev-parse HEAD) ;;
               *)      local_sha=$(git -C "../$repo" rev-parse HEAD) ;;
             esac
-            remote_sha=$(eval "$SSHCMD" "git -C ~/insafdaar/$repo rev-parse HEAD 2>/dev/null" || echo none)
+            remote_sha=none
+            for i in 1 2 3; do
+              if out=$(eval "$SSHCMD" "git -C ~/insafdaar/$repo rev-parse HEAD 2>/dev/null"); then
+                remote_sha="$out"; break
+              fi
+              sleep 5
+            done
             if [ "$local_sha" != "$remote_sha" ]; then
               echo "shipping webapp-$svc ($repo $local_sha -> $remote_sha)"
               docker save "webapp-$svc:latest" | eval "$SSHCMD" "docker load -q"
