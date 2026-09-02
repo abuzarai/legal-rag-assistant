@@ -6,10 +6,76 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy over SSH
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: insafdaar
+
+      # Build contexts live in the four sibling repos; a change in ANY of
+      # them must produce a complete, current image set on the VM.
+      - name: Clone sibling repos
+        run: |
+          cd insafdaar
+          git clone -q --depth 1 -b main https://github.com/abuzarai/legal-rag-assistant.git ../legal-rag-assistant
+          git clone -q --depth 1 -b main https://github.com/abuzarai/drafting-assistant.git ../drafting-assistant
+          git clone -q --depth 1 -b main https://github.com/abuzarai/voice-intake-agent.git ../voice_intake_agent
+        shell: bash
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: insafdaar/backend
+          load: true
+          tags: webapp-backend:latest
+          cache-from: type=gha,scope=webapp-backend
+          cache-to: type=gha,mode=max,scope=webapp-backend
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: insafdaar/frontend
+          load: true
+          tags: webapp-frontend:latest
+          build-args: |
+            REACT_APP_API_BASE_URL=https://129.154.41.160.sslip.io
+            REACT_APP_VOICE_SERVICE_URL=https://129.154.41.160.sslip.io
+          cache-from: type=gha,scope=webapp-frontend
+          cache-to: type=gha,mode=max,scope=webapp-frontend
+
+      - name: Build legal-rag image
+        uses: docker/build-push-action@v6
+        with:
+          context: legal-rag-assistant
+          load: true
+          tags: webapp-legal-rag:latest
+          cache-from: type=gha,scope=webapp-legal-rag
+          cache-to: type=gha,mode=max,scope=webapp-legal-rag
+
+      - name: Build drafting image
+        uses: docker/build-push-action@v6
+        with:
+          context: drafting-assistant
+          load: true
+          tags: webapp-drafting:latest
+          cache-from: type=gha,scope=webapp-drafting
+          cache-to: type=gha,mode=max,scope=webapp-drafting
+
+      - name: Build voice image
+        uses: docker/build-push-action@v6
+        with:
+          context: voice_intake_agent
+          load: true
+          tags: webapp-voice:latest
+          cache-from: type=gha,scope=webapp-voice
+          cache-to: type=gha,mode=max,scope=webapp-voice
+
+      - name: Ship changed images to VM
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
@@ -18,5 +84,29 @@ jobs:
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes ubuntu@"$DEPLOY_HOST" \
-            'bash ~/insafdaar/webapp/scripts/deploy.sh'
+          export SSHCMD="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes ubuntu@$DEPLOY_HOST"
+          for svc in backend frontend legal-rag drafting voice; do
+            local_id=$(docker image inspect -f '{{.Id}}' "webapp-$svc:latest")
+            remote_id=$(eval "$SSHCMD" "docker image inspect -f '{{.Id}}' webapp-$svc:latest 2>/dev/null" || echo none)
+            if [ "$local_id" != "$remote_id" ]; then
+              echo "shipping webapp-$svc ($local_id -> $remote_id)"
+              docker save "webapp-$svc:latest" | eval "$SSHCMD" "docker load -q"
+            else
+              echo "webapp-$svc unchanged ($local_id)"
+            fi
+          done
+        shell: bash
+
+      - name: Apply on VM
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes \
+            -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -o TCPKeepAlive=yes \
+            ubuntu@"$DEPLOY_HOST" 'bash ~/insafdaar/webapp/scripts/deploy.sh'
+        shell: bash
