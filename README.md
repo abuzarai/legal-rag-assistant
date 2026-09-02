@@ -1,25 +1,25 @@
 # Legal RAG Assistant
 
-> **Final Year Project — AI Microservice** · Part of the [Insafdaar](https://github.com/abuzarai/insafdaar-webapp) legal case management platform.  
+> Final Year Project, AI microservice · Part of the [Insafdaar](https://github.com/abuzarai/insafdaar-webapp) legal case management platform.  
 > A retrieval-augmented generation (RAG) service that answers legal questions grounded in Pakistani case law and CPC sections.
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Weaviate](https://img.shields.io/badge/Weaviate-v4-5C3FFB?logo=weaviate&logoColor=white)](https://weaviate.io)
-[![Gemini](https://img.shields.io/badge/Gemini-Vertex_AI-4285F4?logo=google&logoColor=white)](https://cloud.google.com/vertex-ai)
+[![Gemini](https://img.shields.io/badge/Gemini-API-4285F4?logo=google&logoColor=white)](https://ai.google.dev)
 
 ---
 
-## 📖 What Is This?
+## What Is This?
 
-This microservice ingests Pakistani legal documents (case law PDFs, CPC sections) from Google Drive, chunks and embeds them into a Weaviate vector store, and exposes a FastAPI endpoint that answers legal questions with cited sources via Gemini on Vertex AI.
+This microservice ingests Pakistani legal documents (case law PDFs, CPC sections) from Google Drive, chunks and embeds them into a Weaviate vector store, and exposes a FastAPI endpoint that answers legal questions with cited sources using the Gemini API.
 
-It powers the **Legal Assistant Chat** inside the main Insafdaar webapp — advocates ask questions like *"What is Order VII Rule 11?"* and get a structured response with summary, legal analysis, and source citations.
+It powers the **Legal Assistant Chat** inside the main Insafdaar webapp. Users ask questions like *"What is Order VII Rule 11?"* and get a structured response with summary, legal analysis, and source citations.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Google Drive (PDFs, TXTs)
@@ -29,14 +29,13 @@ Google Drive (PDFs, TXTs)
 │          INGESTION PIPELINE                  │
 │                                             │
 │  drive_fetcher.py       Recursive BFS scan  │
-│  text_extractor.py      PyPDFLoader for PDF │
-│  to_json.py             JSON snapshot backup│
+│  text_extractor.py      PDF/TXT extraction  │
 │  embedder.py            Chunk → Embed →     │
 │                         Upsert to Weaviate  │
 │                         (1000-char chunks,  │
 │                          100-char overlap)  │
 │  state_manager.py       MD5 hash tracking,  │
-│                         file/GCS backend    │
+│                         idempotent re-runs  │
 └─────────────┬───────────────────────────────┘
               │
               ▼
@@ -51,8 +50,9 @@ Google Drive (PDFs, TXTs)
     │   page (text)       │
     │   drive_id (text)   │
     │   category (text)   │
-    │  Vectorizer: BYOV   │
-    │  (Gemini embeddings)│
+    │  Vectorizer: none   │
+    │  (bring-your-own    │
+    │   Gemini embeddings)│
     └──────────┬──────────┘
                │
                ▼
@@ -67,7 +67,7 @@ Google Drive (PDFs, TXTs)
 │     └─ "legal" → full retrieval & generation │
 │                                              │
 │  2. similarity_search(query, k)              │
-│     ├─ Embed query (text-embedding-005)      │
+│     ├─ Embed query (gemini-embedding-001)    │
 │     ├─ Hybrid search (Weaviate: alpha=0.5)   │
 │     └─ Cosine-similarity reranking           │
 │                                              │
@@ -79,13 +79,11 @@ Google Drive (PDFs, TXTs)
 │        (Issue · Rule · Application ·         │
 │         Next Step) + Citations               │
 │                                              │
-│  Endpoints:                                  │
+│  Endpoints (all gated on x-internal-key):    │
 │  GET  /query?q=...&k=5  → RAG query         │
 │  POST /ingest            → Trigger ingestion │
-│  POST /drive-events      → Drive Pub/Sub     │
-│  POST /refresh-watch     → Renew webhook     │
 │  GET  /health            → Health check      │
-│  GET  /docs              → List docs         │
+│  GET  /docs              → Ingested file list│
 └──────────────────────────────────────────────┘
 ```
 
@@ -96,7 +94,7 @@ Google Drive (PDFs, TXTs)
 
 ### `GET /query`
 
-Run a RAG query against the vector store.
+Run a RAG query against the vector store. Requires the `x-internal-key` header.
 
 **Parameters:**
 
@@ -132,56 +130,47 @@ Run a RAG query against the vector store.
 
 ### `POST /ingest`
 
-Trigger a full re-ingestion of all documents from the configured Google Drive folder. Thread-safe — only one ingestion runs at a time.
+Trigger ingestion of new/changed documents from the configured Google Drive folder. Re-runs skip unchanged files (MD5-tracked), and only one ingestion runs at a time.
 
 **Response:** `{"status": "ok", "root": "<folder-id>"}` or `429` if already running.
 
-### `POST /drive-events`
-
-Receives Google Drive Pub/Sub push notifications for file changes and triggers ingestion as a background task.
-
-### `POST /refresh-watch`
-
-Re-registers the Drive webhook channel (channels expire after 7 days).
-
 ### `GET /health`
 
-**Response:** `{"status": "ok", "env": "local"}`
+**Response:** `{"status": "ok", "env": "prod"}`
 
 ### `GET /docs`
 
-**Response:** `{"documents": ["filename1.json", "filename2.json", ...]}` — lists all processed JSON snapshots.
+**Response:** `{"documents": ["filename1.json", "filename2.json", ...]}` lists the ingested documents.
 
 </details>
 
 ---
 
-## 📥 Ingestion Pipeline
+## Ingestion Pipeline
 
 The ingestion pipeline converts legal documents from Google Drive into searchable vector embeddings:
 
-### 1. Document Fetching (`drive_fetcher.py`)
+### 1. Document Fetching
 
 - Recursive BFS traversal of all subfolders from a root Drive folder
-- Supports shared drives
 - Tracks files by `DriveFile` dataclass (id, name, mime_type, md5_checksum, category, relative_path)
 - Folder hierarchy maps to document categories (e.g., `cpc-sections/`, `case-laws/`)
 
-### 2. Text Extraction (`text_extractor.py`)
+### 2. Text Extraction
 
 | Format | Tool | Output |
 |--------|------|--------|
 | PDF | `PyPDFLoader` (langchain) | Page-by-page `{page_content, metadata}` |
 | TXT | Direct read | Single-entry `{page_content, metadata}` |
 
-### 3. Chunking & Embedding (`embedder.py`)
+### 3. Chunking & Embedding
 
 - `RecursiveCharacterTextSplitter`: 1000-char chunks, 100-char overlap
-- Embeddings: Gemini `text-embedding-005` via Vertex AI
-- Rate-limit handling: Exponential backoff (up to 5 retries)
+- Embeddings: `gemini-embedding-001` via the Gemini API (768 dims, `output_dimensionality=768`)
+- Rate-limit handling: exponential backoff (up to 5 retries, gentle pacing)
 - Batch upload: 32 documents at a time to Weaviate, 10s delay between batches
 
-### 4. State Management (`state_manager.py`)
+### 4. State Management
 
 Tracks which files have been processed and whether their embeddings are up-to-date:
 
@@ -191,16 +180,14 @@ Tracks which files have been processed and whether their embeddings are up-to-da
   "hash": "md5-hash",
   "last_processed": "2026-01-27T12:00:00",
   "embeddings": {
-    "model": "text-embedding-005",
+    "model": "gemini-embedding-001",
     "done": true,
     "last_embedded": "2026-01-27T12:00:05"
   }
 }
 ```
 
-Supports two backends:
-- **File** — `./artifacts/ingestion_state.json` (local dev)
-- **GCS** — Google Cloud Storage blob (Cloud Run for persistence across restarts)
+File-backed state (`./artifacts/ingestion_state.json`) with deterministic chunk UUIDs, so interrupted runs resume and re-runs never duplicate.
 
 ### 5. Repository-to-Category Mapping
 
@@ -214,30 +201,31 @@ Documents are organized by Drive folder structure into normalized categories:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Component | Technology |
 |-----------|-----------|
 | **Framework** | FastAPI + Uvicorn |
-| **Vector Store** | Weaviate v4 (self-hosted on GCE or cloud) |
-| **Embeddings** | Gemini `text-embedding-005` via Vertex AI |
-| **LLM** | Gemini 2.5 Flash via Vertex AI (`temperature=0.2`) |
-| **Document Source** | Google Drive API v3 (recursive folder scan) |
+| **Vector Store** | Weaviate v4 (self-hosted) |
+| **Embeddings** | Gemini `gemini-embedding-001` via the Gemini API |
+| **LLM** | Gemini 2.5 Flash via the Gemini API (`temperature=0.2`) |
+| **Document Source** | Google Drive API v3 (recursive folder scan, hourly refresh) |
 | **PDF Extraction** | PyPDFLoader (langchain) |
 | **Text Splitting** | RecursiveCharacterTextSplitter (1000/100) |
-| **Deployment** | Google Cloud Run (auto-deploy from GitHub) |
+| **Deployment** | Container in the Insafdaar compose stack (Oracle Cloud Infrastructure) |
 | **Language** | Python 3.13 |
 | **Package Manager** | `uv` |
 
 ---
 
-## 🚀 Local Development
+## Local Development
 
 ### Prerequisites
 
 - Python 3.13+ with [uv](https://docs.astral.sh/uv/)
-- GCP service account with Vertex AI, Drive, and Storage access
-- Weaviate instance (local Docker or remote)
+- Gemini API key ([AI Studio](https://aistudio.google.com/apikey))
+- Google Drive service account (read access to the corpus folder)
+- Weaviate instance (local Docker or compose)
 
 ### Setup
 
@@ -258,29 +246,31 @@ uv sync
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `GOOGLE_APPLICATION_CREDENTIALS` | Yes | `service_account.json` | Path to GCP service account key |
-| `GOOGLE_CLOUD_PROJECT` | Yes | — | GCP project ID for Vertex AI |
-| `GOOGLE_VERTEX_LOCATION` | No | `asia-south1` | Vertex AI region |
-| `WEAVIATE_URL` | Yes | — | Weaviate endpoint (e.g., `http://localhost:8080`) |
-| `WEAVIATE_API_KEY` | Yes | — | Weaviate API key |
+| `GEMINI_API_KEY` | Yes | None | Gemini API key (embeddings + LLM) |
+| `GEMINI_MODEL` | No | `gemini-2.5-flash` | LLM model name |
+| `EMBEDDING_MODEL` | No | `gemini-embedding-001` | Embeddings model |
+| `EMBEDDING_OUTPUT_DIMS` | No | `768` | Embedding dimensionality |
+| `WEAVIATE_URL` | Yes | None | Weaviate endpoint (e.g., `http://localhost:8080`) |
+| `WEAVIATE_API_KEY` | Yes | None | Weaviate API key |
 | `WEAVIATE_COLLECTION` | No | `LegalChunk` | Weaviate collection name |
 | `WEAVIATE_GRPC_PORT` | No | `50051` | Weaviate gRPC port |
-| `DRIVE_ROOT_FOLDER_ID` | Yes | — | Root Google Drive folder ID for ingestion |
+| `DRIVE_ROOT_FOLDER_ID` | Yes | None | Root Google Drive folder ID for ingestion |
 | `DRIVE_ALLOWED_EXTS` | No | `pdf` | Comma-separated allowed file extensions |
-| `INGESTION_STATE_BACKEND` | No | `file` | State storage: `file` or `gcs` |
-| `GEMINI_API_KEY` | No | — | Only for local Gemini API (not Vertex AI) |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Yes (Drive) | None | Path to the Drive service-account key |
+| `INGESTION_STATE_BACKEND` | No | `file` | State storage backend (`file`) |
+| `INTERNAL_API_KEY` | No | None | Shared secret the webapp sends with `x-internal-key` |
 
 ### Run
 
 ```bash
-# 1. Ingest documents into Weaviate
+# 1. Ingest documents into Weaviate (resumable; re-run to pick up changes)
 uv run python -m src.ingestion.ingest
 
 # 2. Start the API
 uv run uvicorn src.backend.main:app --reload
 
-# 3. Query
-curl "http://localhost:8000/query?q=What+is+Order+VII+Rule+11&k=5"
+# 3. Query (needs the internal key header)
+curl -H "x-internal-key: YOUR_KEY" "http://localhost:8000/query?q=What+is+Order+VII+Rule+11&k=5"
 ```
 
 ### Test
@@ -291,23 +281,19 @@ uv run pytest tests/test_rag_api.py -v
 
 ---
 
-## ☁️ Deployment
+## Deployment
 
-The service is deployed on **Google Cloud Run** with GitHub-connected auto-deploy. Key configuration:
+The service runs as a container in the Insafdaar compose stack. Key configuration:
 
-- **Service**: Cloud Run (min-scale 0, max-scale 2, concurrency 10)
-- **Environment**: `ENV=prod` (disables `.env` loading, uses Cloud Run env vars/secrets)
-- **Ingress**: Internal + Cloud Load Balancing (private to the main webapp's VPC)
-- **Auth**: IAM-based (service accounts) for `/ingest`; unauthenticated for `/query`
-- **Auto-ingestion**: Cloud Scheduler triggers `POST /ingest` daily, or Drive Pub/Sub webhook triggers on change
+- **Environment**: `ENV=prod` (disables `.env` loading, uses runtime env vars)
+- **Auth**: every endpoint except `/health` enforces the shared `x-internal-key`
+- **Ingestion cadence**: the host triggers `POST /ingest` hourly via cron; resumable state makes re-runs idempotent
 
-### Self-hosting Weaviate
-
-See [`docs/weaviate_gce.md`](docs/weaviate_gce.md) for setting up Weaviate on a GCE VM with Docker and API-key auth.
+Deploys are handled by the main webapp's pipeline (GitHub Actions builds the image on a runner, ships it, and applies the stack).
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 legal-rag-assistant/
@@ -316,9 +302,7 @@ legal-rag-assistant/
 │   │   ├── main.py                # FastAPI app, routes
 │   │   ├── deps.py                # Embeddings, Weaviate search, reranker
 │   │   ├── rag.py                 # RAG pipeline, mode detection, Gemini
-│   │   ├── rerank.py              # Gemini-based reranker (experimental)
-│   │   ├── drive_watcher.py       # Drive Pub/Sub webhook
-│   │   └── drive_watch_refresh.py # Webhook channel renewal
+│   │   └── rerank.py              # Local cosine reranker
 │   ├── common/
 │   │   ├── config.py              # Environment variable wrappers
 │   │   ├── logger.py              # Structured logging
@@ -327,20 +311,16 @@ legal-rag-assistant/
 │       ├── ingest.py              # Main ingestion pipeline
 │       ├── drive_fetcher.py       # Google Drive recursive BFS scanner
 │       ├── text_extractor.py      # PDF/TXT text extraction
-│       ├── to_json.py             # JSON snapshot writer
-│       ├── state_manager.py       # Ingestion state (file or GCS)
+│       ├── state_manager.py       # Ingestion state (file backend)
 │       └── embedder.py            # Chunking, embedding, Weaviate upsert
 ├── tests/
 │   └── test_rag_api.py            # FastAPI TestClient tests
-├── docs/
-│   ├── weaviate_gce.md            # Self-hosted Weaviate setup guide
-│   └── cloud_run_scheduler.md     # Cloud Scheduler /ingest trigger guide
-├── Dockerfile                     # Cloud Run build
+├── Dockerfile                     # Container build
 └── pyproject.toml                 # Dependencies & project metadata
 ```
 
 ---
 
-## 📝 License
+## License
 
-Licensed under the [Apache License 2.0](LICENSE).  
+Licensed under the [Apache License 2.0](LICENSE).
