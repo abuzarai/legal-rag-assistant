@@ -83,19 +83,34 @@ jobs:
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
-          export SSHCMD="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes ubuntu@$DEPLOY_HOST"
-          for svc in backend frontend legal-rag drafting voice; do
-            local_id=$(docker image inspect -f '{{.Id}}' "webapp-$svc:latest")
-            remote_id=$(eval "$SSHCMD" "docker image inspect -f '{{.Id}}' webapp-$svc:latest 2>/dev/null" || echo none)
-            if [ "$local_id" != "$remote_id" ]; then
-              echo "shipping webapp-$svc ($local_id -> $remote_id)"
+          printf '%s
+' "$DEPLOY_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s
+' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          SSHCMD="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes ubuntu@$DEPLOY_HOST"
+          # Gate on the source repo's HEAD: image ids change on every build
+          # even when content is identical, so id-comparison re-ships large
+          # images needlessly (the slow host chokes on the stream). A
+          # service only ships when its repo moved past what the VM has.
+          ship_if_repo_changed () {
+            svc="$1"; repo="$2"
+            case "$repo" in
+              webapp) local_sha=$(git -C insafdaar rev-parse HEAD) ;;
+              *)      local_sha=$(git -C "../$repo" rev-parse HEAD) ;;
+            esac
+            remote_sha=$(eval "$SSHCMD" "git -C ~/insafdaar/$repo rev-parse HEAD 2>/dev/null" || echo none)
+            if [ "$local_sha" != "$remote_sha" ]; then
+              echo "shipping webapp-$svc ($repo $local_sha -> $remote_sha)"
               docker save "webapp-$svc:latest" | eval "$SSHCMD" "docker load -q"
             else
-              echo "webapp-$svc unchanged ($local_id)"
+              echo "webapp-$svc unchanged ($repo @ $local_sha)"
             fi
-          done
+          }
+          ship_if_repo_changed backend webapp
+          ship_if_repo_changed frontend webapp
+          ship_if_repo_changed legal-rag legal-rag-assistant
+          ship_if_repo_changed drafting drafting-assistant
+          ship_if_repo_changed voice voice_intake_agent
         shell: bash
 
       - name: Apply on VM
