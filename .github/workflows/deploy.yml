@@ -9,9 +9,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout this repo
+      - name: Checkout webapp (compose owner + shared contexts)
         uses: actions/checkout@v4
         with:
+          repository: abuzarai/insafdaar-webapp
           path: insafdaar
 
       # Build contexts live in the four sibling repos; a change in ANY of
