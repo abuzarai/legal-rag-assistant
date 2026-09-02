@@ -1,0 +1,16 @@
+name: Deploy via insafdaar-webapp pipeline
+
+# Pushes to this repo run the shared deploy pipeline (workflow file lives
+# in insafdaar-webapp; secrets are inherited, no cross-repo PAT needed).
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: abuzarai/insafdaar-webapp/.github/workflows/deploy.yml@main
+    secrets: inherit
