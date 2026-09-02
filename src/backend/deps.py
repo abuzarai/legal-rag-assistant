@@ -125,7 +125,8 @@ def similarity_search(
             limit=max(k * 3, 10),  # get more for reranking
             filters=where_filter,
             return_properties=["content", "source", "page", "drive_id"],
-            return_metadata=["distance", "vector"],  # vector lets the local reranker work
+            return_metadata=["distance"],
+            include_vector=True,  # vector lets the local reranker work
         )
     else:
         logger.info(f"🔍 Running pure vector search for '{query}'...")
@@ -134,7 +135,8 @@ def similarity_search(
             limit=max(k * 3, 10),
             filters=where_filter,
             return_properties=["content", "source", "page", "drive_id"],
-            return_metadata=["distance", "vector"],
+            return_metadata=["distance"],
+            include_vector=True,
         )
 
     objects = getattr(response, "objects", None) or []
@@ -154,7 +156,7 @@ def similarity_search(
             "page": props.get("page"),
             "drive_id": props.get("drive_id"),
             "distance": getattr(getattr(obj, "metadata", None), "distance", None),
-            "_vector": getattr(getattr(obj, "metadata", None), "vector", None),
+            "_vector": (obj.vector or {}).get("default") if isinstance(obj.vector, dict) else obj.vector,
         }
         metadata = {k: v for k, v in metadata.items() if v is not None}
         docs.append(Document(page_content=content, metadata=metadata))
