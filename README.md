@@ -17,6 +17,10 @@ This microservice ingests Pakistani legal documents (case law PDFs, CPC sections
 
 It powers the **Legal Assistant Chat** inside the main Insafdaar webapp. Users ask questions like *"What is Order VII Rule 11?"* and get a structured response with summary, legal analysis, and source citations.
 
+A conversation inside the chat, with cited source documents:
+
+![Legal Assistant conversation with cited sources](screenshots/legal-assistant-chat.png)
+
 ---
 
 ## Architecture
