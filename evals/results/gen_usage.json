@@ -1,0 +1,5 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "input_tokens": 88081,
+  "output_tokens": 22947
+}

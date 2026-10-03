@@ -1,0 +1,11 @@
+{
+  "usable_candidates": 107,
+  "dropped_duplicates": [],
+  "eval_items": 107,
+  "by_category": {
+    "case-laws": 63,
+    "cpc-sections": 44
+  },
+  "multi_gold_items": 7,
+  "leaky_items": 1
+}

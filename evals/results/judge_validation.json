@@ -1,0 +1,22 @@
+{
+  "grounded": {
+    "n": 16,
+    "agreement": 0.9375,
+    "kappa": 0.0
+  },
+  "citation_accurate": {
+    "n": 16,
+    "agreement": 1.0,
+    "kappa": 1.0
+  },
+  "hallucination": {
+    "n": 16,
+    "agreement": 1.0,
+    "kappa": 1.0
+  },
+  "correct": {
+    "n": 16,
+    "agreement": 0.9375,
+    "kappa": 0.6363636363636364
+  }
+}

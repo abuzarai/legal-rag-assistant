@@ -6,7 +6,7 @@ from pathlib import PurePosixPath
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.backend.deps import similarity_search
+from src.backend.deps import embed_query, similarity_search
 from src.common.config import get_gemini_api_key
 from src.common.logger import get_logger
 
@@ -441,14 +441,24 @@ def run_rag(query: str, k: int = 5) -> dict:
     # If either category is empty, the missing side is simply skipped.
     k_s = max(int(os.environ.get("RAG_STATUTE_CHUNKS", "3")), 1)
     k_c = max(int(os.environ.get("RAG_CASELAW_CHUNKS", "2")), 0)
+    # Embed the query once and reuse the vector for both category searches.
+    query_vector = embed_query(normalized_query)
     docs = []
     if k_s:
         docs += similarity_search(
-            normalized_query, k=k_s, category="cpc-sections", use_hybrid=True
+            normalized_query,
+            k=k_s,
+            category="cpc-sections",
+            use_hybrid=True,
+            query_vector=query_vector,
         )
     if k_c:
         docs += similarity_search(
-            normalized_query, k=k_c, category="case-laws", use_hybrid=True
+            normalized_query,
+            k=k_c,
+            category="case-laws",
+            use_hybrid=True,
+            query_vector=query_vector,
         )
     # ── end statute-first ────────────────────────────────────────────────
 

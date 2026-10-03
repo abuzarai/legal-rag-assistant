@@ -1,0 +1,440 @@
+{
+  "reviewed_by": "evaluating agent, reading each item against its verbatim support quote and anchor chunk",
+  "date": "2026-09-14",
+  "method": "For all 107 items: confirm the reference answer follows from the verbatim support quote (already enforced to be a substring of the anchor chunk), and that the citation names the provision the anchor is about. Four items with detail beyond the truncated quote were re-read against the full anchor. Four citations were corrected after the anchor text showed a different provision number.",
+  "n_items": 107,
+  "items": {
+    "q001": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q002": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q003": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q004": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q005": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q006": {
+      "verdict": "accept",
+      "note": "re-read full anchor; details in the answer are supported"
+    },
+    "q007": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q008": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q009": {
+      "verdict": "accept",
+      "note": "re-read full anchor; details in the answer are supported"
+    },
+    "q010": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q011": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q012": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q013": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q014": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q015": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q016": {
+      "verdict": "accept",
+      "note": "re-read full anchor; details in the answer are supported"
+    },
+    "q017": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q018": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q019": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q020": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q021": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q022": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q023": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q024": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q025": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q026": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q027": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q028": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q029": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q030": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q031": {
+      "verdict": "accept",
+      "note": "re-read full anchor; details in the answer are supported"
+    },
+    "q032": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q033": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q034": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q035": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q036": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q037": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q038": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q039": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q040": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q041": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q042": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q043": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q044": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q045": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q046": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q047": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q048": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q049": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q050": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q051": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q052": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q053": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q054": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q055": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q056": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q057": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q058": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q059": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q060": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q061": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q062": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q063": {
+      "verdict": "accept_with_fix",
+      "note": "generator wrote 'Section 36'; anchor text is numbered rule 36 under Order XXI commentary",
+      "corrected_citation": "Order XXI, Rule 36, CPC"
+    },
+    "q064": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q065": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q066": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q067": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q068": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q069": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q070": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q071": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q072": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q073": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q074": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q075": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q076": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q077": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q078": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q079": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q080": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q081": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q082": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q083": {
+      "verdict": "accept",
+      "note": "reference citation is generic (not a specific provision); left as-is"
+    },
+    "q084": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q085": {
+      "verdict": "accept",
+      "note": "reference citation is generic (not a specific provision); left as-is"
+    },
+    "q086": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q087": {
+      "verdict": "accept_with_fix",
+      "note": "generator wrote 'Section 7'; anchor text is numbered rule 7 under Order XII",
+      "corrected_citation": "Order XII, Rule 7, CPC"
+    },
+    "q088": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q089": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q090": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q091": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q092": {
+      "verdict": "accept_with_fix",
+      "note": "generator cited Section 35A (previous sentence); quoted sentence is Order XLI R.25 remand",
+      "corrected_citation": "Order XLI, Rule 25, CPC"
+    },
+    "q093": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q094": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q095": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q096": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q097": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q098": {
+      "verdict": "accept",
+      "note": "reference citation is generic (not a specific provision); left as-is"
+    },
+    "q099": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q100": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q101": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q102": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q103": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q104": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q105": {
+      "verdict": "accept",
+      "note": ""
+    },
+    "q106": {
+      "verdict": "accept_with_fix",
+      "note": "generator cited Section 141; content is Order XXIII R.3 adjustment/compromise commentary",
+      "corrected_citation": "Order XXIII, Rule 3, CPC"
+    },
+    "q107": {
+      "verdict": "accept",
+      "note": ""
+    }
+  }
+}

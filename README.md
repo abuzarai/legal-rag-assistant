@@ -72,8 +72,7 @@ Google Drive (PDFs, TXTs)
 │                                              │
 │  2. similarity_search(query, k)              │
 │     ├─ Embed query (gemini-embedding-001)    │
-│     ├─ Hybrid search (Weaviate: alpha=0.5)   │
-│     └─ Cosine-similarity reranking           │
+│     └─ Hybrid search (Weaviate: alpha=0.5)   │
 │                                              │
 │  3. is_retrieval_weak(docs)                  │
 │     └─ Heuristic check (distance thresholds) │
@@ -280,7 +279,7 @@ curl -H "x-internal-key: YOUR_KEY" "http://localhost:8000/query?q=What+is+Order+
 ### Test
 
 ```bash
-uv run pytest tests/test_rag_api.py -v
+uv run pytest -v
 ```
 
 ---
@@ -304,9 +303,9 @@ legal-rag-assistant/
 ├── src/
 │   ├── backend/
 │   │   ├── main.py                # FastAPI app, routes
-│   │   ├── deps.py                # Embeddings, Weaviate search, reranker
-│   │   ├── rag.py                 # RAG pipeline, mode detection, Gemini
-│   │   └── rerank.py              # Local cosine reranker
+│   │   ├── auth.py                # x-internal-key auth dependency
+│   │   ├── deps.py                # Embeddings, Weaviate search
+│   │   └── rag.py                 # RAG pipeline, mode detection, Gemini
 │   ├── common/
 │   │   ├── config.py              # Environment variable wrappers
 │   │   ├── logger.py              # Structured logging
@@ -316,9 +315,13 @@ legal-rag-assistant/
 │       ├── drive_fetcher.py       # Google Drive recursive BFS scanner
 │       ├── text_extractor.py      # PDF/TXT text extraction
 │       ├── state_manager.py       # Ingestion state (file backend)
+│       ├── to_json.py             # Per-document JSON snapshots
 │       └── embedder.py            # Chunking, embedding, Weaviate upsert
 ├── tests/
-│   └── test_rag_api.py            # FastAPI TestClient tests
+│   ├── test_rag_api.py            # FastAPI TestClient tests
+│   ├── test_rag_logic.py          # RAG pipeline logic tests
+│   ├── test_auth.py               # Internal-key auth tests
+│   └── test_ingestion_state.py    # Ingestion state tests
 ├── Dockerfile                     # Container build
 └── pyproject.toml                 # Dependencies & project metadata
 ```

@@ -1,0 +1,561 @@
+### gemini-3.5-flash-lite:q019
+Q: Does ignorance or mistake of law serve as a valid ground for the condonation of delay under established legal principles in Pakistan?
+REF: No, ignorance or mistake of law does not constitute a valid reason for condoning delay unless such ignorance is bona fide and completely free from negligence, as established by the maxim ignorantia legis neminem excusat.
+ANS: **Summary:** No, ignorance or mistake of law is not a valid reason for condoning delay unless it is bona fide and completely unaccompanied by negligence, and the maxim *ignorantia legis neminem excusat* firmly establishes that such ignorance is no excuse when it could have been avoided by consulting the relevant law (1992 S C M R 424.pdf p.4).
+CTX: <context index="1">
+[Source 1 | CPC_text_part9_of19.txt | page 1]
+o Delay in arrival on account of picketting (m).
+
+o Where parties had no notice of transfer of case to the court which dismissed it (n).
+
+© Mistake as to the court in which the case would be heard (0).
+
+0 Pleader's illness or death (p).
+
+0 =~ Mistake of court officials (q).
+
+o _ Where notice was served on the counsel, who did not intimate the client (r).
+
+o Where address of party is incorrectly given in summons (ra).
+
+o When the case was transferred of which the parties had no notice (rb)
+
+o Where the lawyer refused to appear, without any prior intimation to the client (s).
+
+o Where there was misapprehension regarding the court where the suit was pending (t).
+
+o Where the party went to call its counsel (u).
+
+(k) A1955M70.
+
+(l) A1949M 46. %
+
+(la) 1993 CLC 660.
+
+(lb) P 1992 SC 577
+
+(Ic) 1995 MLD 484; 1992 CLC 1754; 1988 CLC 1208; P 1988 P 33; 1986 CLC 2643; 1984 CLC
+3045.
+
+(Id) 1988 SCMR 552.
+
+(le) 2011 CLC 1045; 1991 CLCN 296,
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part6_of19.txt | page 1]
+Time fixed by final order. The court cannot extend time where the period is granted by an
+order, the non-compliance of which will determine the jurisdiction of the court (y). For instance,
+where a suit dismissed in default is restored subject to the condition that a certain amount be paid
+as costs by a certain date, failing which the application shall stand dismissed (z), or where an ex
+(p) P 2004 SC 752; 1995 SC
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q081
+Q: What is the legal definition of a judgment-debtor under the Code of Civil Procedure?
+REF: A judgment-debtor is defined as any person against whom a decree has been passed or an order capable of execution has been made.
+ANS: **Summary:** A "judgment-debtor" means any person against whom a decree has been passed or an order capable of execution has been made, whose name is on the record as a party at the time of the adjudication (Section 2(11) — CPC_text_part1_of19.txt p.1).
+CTX: <context index="1">
+[Source 1 | CPC_text_part1_of19.txt | page 1]
+S. 2(11)
+(10) "judgment-debtor" means any person against whom a decree ha: been
+passed or an order capable of execution has been made:
+Judgment-debtor. Any person whose name is on the record as a party at the time of the
+adjudication and against whom a decree or order capable of execution is passed is a judgment
+debtor, (a) Parties against whom no decrees or orders capable of execution are passed are
+obviously not judgment debtors^
+). A decree passed against several judgment debtors jointly may
+be executed against any one judgment debtor who will thereafter have a right of contribution
+against the other joint judgment debtors(c). See Order 21 rule 16. The term "judgment debtor" as
+defined does not include a judgment debtor's assignee^. See notes under Sections 50, 52 and 146.
+(11) "legal representative" means a person who in law represents the estate
+of a deceased person, and includes any person who intermeddles with the estate of
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part4_of19.txt | page 1]
+If a decree is passed against a person in his capacity as a legal representative, such person is
+the judgment debtor, and a decree for the payment of money may be executed by the attachment
+and sale of such property of the deceased in the hands of such judgment debtor(c), as has not been
+duly disposed of(<i). It cannot be executed against his personal property(e). Where the legal
+representative himself dies,
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q088
+Q: What are the key characteristics of a mistake or error apparent on the face of the record for review purposes?
+REF: A mistake or error apparent on the face of the record can be one of law or fact, must be self-evident from perusal of the record without requiring extraneous evidence, should be floating on the surface, and must be evident without elaborate arguments.
+ANS: **Summary:** An error apparent on the face of the record can be one of law or fact, and must be self-evident from a perusal of the record itself without requiring extraneous evidence, elaborate arguments, or a mental process of reasoning ((Source 2 | CPC_text_part17_of19.txt | page 1), (Source 1 | CPC_text_part17_of19.txt | page 1)). 
+
+**Detailed Analysis:** 
+To qualify for review, the mistake or error must possess the following characteristics:
+* It must be self-evident, floating on the surface of the record, and apparent upon perusal without needing extraneous evidence or elaborate arguments ((Source 2 | CPC_text_part17_of19.txt | page 1)).
+* It can be a mistake of either fact or law ((Source 2 | CPC_text_part17_of19.txt | page 1)).
+* The error must relate to a proposition that is well-settled and beyond controversy; a conscious decision or a mere difference of opinion between judges does not constitute an error apparent on the face of the record ((Source 3 | CPC_text_part17_of19.txt | page 1)).
+* The error must have a material bearing on the fate of the case and cannot be of inconsequential import, though review is disallowed if the erroneous finding is sustainable on other available grounds ((Source 1 | CPC_text_part17_of19.txt | page 1)).
+* The court's power of review permits the correction of accidental and arithmetical mistakes due to human forgetfulness, provided they do not involve a mental process of reasoning or the appreciation of law or previously proved or admitted facts ((Source 1 | CPC_text_part17_of19.txt | page 1)).
+CTX: <context index="1">
+[Source 1 | CPC_text_part17_of19.txt | page 1]
+clear as cannot be permitted by any court to remain on record (gb). The error must also have a
+material bearing on the fate of the case and be not of inconsequential import (qc). Where the
+finding, though erroneous, is sustainable on other grounds available on record, review will not be
+allowed (qd). The point of law must be indisputable (r), and it is not sufficient that another view is
+possible (s). It is immaterial how the error occurred (t).
+
+The question as to whether an error is an error apparent on the face of the record is to be
+determined on the facts of each case (u). In the exercise of its powers of review the court can
+correct accidental and arithmetical mistakes due to human forgetfulness and not involving mental
+process of reasoning or appreciation of law or facts already proved or admitted (ua).
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part17_of19.txt | page 1]
+Mistake or error apparent on the face of the record. Such mistake or error may be one
+of law (0), or fact (p), and should be apparent on the face of the record, i.e., it should be self-
+evident from a perusal of the record itself, and should not require any extraneous evidence to
+establish it (q). The errors should be floating on the surface of the record (qq). The error should be
+evident i.e., it can be established without elaborate arguments (qa). It should be so manifest and
+(c) P1968D779; A 1944 A 238; A 1928 B 308 See A 1
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q037
+Q: What happens if a plaintiff fails to deposit the required sum within the period fixed by the court or chooses to withdraw it?
+REF: If the plaintiff fails to make the required deposit within the court-fixed period or withdraws the deposited sum, their suit must be dismissed.
+ANS: **Summary:** If a plaintiff fails to make the required deposit within the period fixed by the court or withdraws the sum deposited, their suit shall be dismissed ([Source 4 | 2017 C L C Note 144.pdf | page 3]).
+CTX: <context index="1">
+[Source 1 | CPC_text_part14_of19.txt | page 1]
+ourt otherwise directs) be paid to the plaintiff on his application,
+
+Comp, Ref,: 1882, S. 377; 1877 8. 377. ;
+
+Cross Ref.; RSC 22.4; App. H.3.
+
+Notes. For form of notice, see Form No. 3, Appendix. H, Where deposit is made in the
+presence of the plaintiff, notice is not necessary(h). The court has discretion to refuse permission to
+the plaintiff to withdraw the amount deposited(i), as for instance, where it is claimed by different
+parties to the suit(),
+
+3, Interest on deposit not allowed to plaintiff after notice.- No interest shall
+be allowed to the plaintiff on any sum deposited by the defendant from the date of
+the receipt of such notice, whether the sum deposited is in full of the claim or falls
+short thereof. .
+
++ Comp. Ref.: 1822, S, 378; 1877, S. 378. :
+. Interest. After ths service of a notice rule 2 ante, the plaintiff is not entitled to interest on
+
+. the sun deposited(k), unless the court at the instance of the defendant refuses permission to the
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part14_of19.txt | page 1]
+plaintiff to withdraw the amount deposited(l). The amount should be deposited in profitable
+
+Order 24 .
+
+(a) A 1926 M 1069. i= |
+
+(b) A1937L 733; A 1936 L 76; A 1927 C 72. ;
+
+(c) 22B 415. .
+
+(dq) A19350 93.
+
+(e) A19350 93.
+
+() (1883) 22 Ch. D 611.
+
+(g) 213 502.
+
+(ga) P 1979 L 766.
+
+(h) A 1935 M 342. : ar
+
+(i) 26C766. . s 7 ”
+
+Gj) 158681. : :
+.(k) A 1935 0 93; A 1918 M 1360; 26 C
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q104
+Q: What is the legal effect on a pending suit or appeal if a party's interest devolves during the proceedings?
+REF: The mere devolution of interest of a party pending a suit or appeal will not arrest the hearing of the suit. The suit will continue between the original parties, and the person acquiring the interest pendente lite will be bound by the resulting judgment and decree regardless of whether they join the suit.
+ANS: **Summary:** When an interest devolves during the pendency of a suit or appeal, the proceedings may be continued by or against the person upon whom the interest has devolved, and such person is bound by the resulting decree whether impleaded as a party or not (CPC_text_part13_of19.txt p.1). 
+
+**Detailed Analysis:** The term "interest" covers subject-matter interests, intangible rights, rights to maintain a suit, or virtually affected interests (CPC_text_part13_of19.txt p.1). Devolution of a representative interest is governed accordingly regardless of whether it occurs due to death, though personal rights do not devolve (CPC_text_part13_of19.txt p.1). Furthermore, the provisions regarding devolution apply to both plaintiffs and defendants, as well as appellants and respondents during the pendency of an appeal (CPC_text_part13_of19.txt p.1).
+CTX: <context index="1">
+[Source 1 | CPC_text_part13_of19.txt | page 1]
+not apply to a lease(z). Where the interests of proprietors are extinguished, this rule will be
+inapplicable(a). The term "interest" refers to an interest in subject matter of the suit(b), and may
+even be an intangible right(c). The term ‘interest’ would include a right to maintain a suit(d), or any
+interest which is virtually affected by the suit(e), and also a portion of the interest(f). Devolution of
+a representative interest is governed by this rule and not rule 3 or 4 regardless of whether it takes
+place on account of death(g). The person on whom the right devolves is bound by the decree
+whether he was impleaded as a party or not(h). However, where the right is of a personal character,
+there will be no devolution(i). Transfer of decrees is governed by Order 21 rule 16, and not by this tule(j).
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part13_of19.txt | page 1]
+(i) 1996 CLC 678; P 1976 L 650; A 1953 Pat. 178; A 1946 L 33; A 1942 R 13; A 1937 M915.
+
+(j) 2007 SCMR 882; 1997 SCMR 171; 1996 SCMR 781; 1992 SCMR 652; PLJ 2002 L 1556;
+1998 CLC 314; 1998 CLC 1419; P 1988 K 58; P 1976 L 650; A 1958 Pat. 630 FB; A 1956
+TC 147 FB; A 1952 MB 154; A 1946 L 33; A 1941 O 495 See A 1922 PC 304.
+
+(ja) 2009 SCMR 385; 1992 SCMR 652
+
+(k) .1992 SCMR 652; 1982 CLC 738; P 1976 L 650; A 1942 R 13.
+
+where devolution takes place after the passing of the decree and before the institution of the
+appeal(n). Rule 10 is furth
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q092
+Q: Is an appellate court permitted to transmit proceedings back to the trial court for recording evidence and findings?
+REF: Yes, an appellate court has the authority to transmit the proceedings for the recording of evidence and findings to the trial court.
+ANS: **Summary:** Yes, an appellate court is permitted to send a case back to the trial court to record findings on a specific issue and return the evidence and findings to the appellate court (Order 41, Rule 25 — CPC_text_part16_of19.txt p.1), or to remand the case for a decision afresh (Order 41, Rules 23 and 23A — CPC_text_part5_of19.txt p.1; 1989 M L D 1093.pdf p.3). 
+
+**Detailed Analysis:** Under Rule 25, the appellate court can send a case back to the trial court specifically for recording findings on an omitted issue, during which time the appeal remains pending before the appellate court (Order 41, Rule 25 — CPC_text_part16_of19.txt p.1). Recording evidence upon this remand is discretionary with the appellate court, meaning the lower court is not bound to record evidence unless directed to do so (Order 41, Rule 25 — CPC_text_part16_of19.txt p.3). Additionally, courts can remand cases under Order 41, rules 23 and 23A, or through inherent powers under Section 151 (CPC_text_part5_of19.txt p.1).
+CTX: <context index="1">
+[Source 1 | CPC_text_part16_of19.txt | page 1]
+In terms of rule 25 the case is sent back to the trial court for recording its finding on an issue
+and not for the trial and disposal of the case (0). After recording findings on all the issues remitted,
+the trial court is to return the evidence together with its findings to the appellate court for the
+disposal of the appeal in accordance with rule 26 post (p). During proceedings before the trial
+court, the appeal continues to remain pending before the appellate court (q), but the trial court has
+all powers necessary to try the issue, such as impleading legal representatives of deceased
+parties(qa). It is the duty of the court to frame issues correctly, so that the parties may know what
+evidence to lead and an effective judgment be rendered (qb). See Order 14. The provisions of this
+tule are applicable only where the court from whose decree the appeal is preferred, has omitted to
+frame or try any issue or determine any question of fact which appears to the appellate court
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part5_of19.txt | page 1]
+o Determine a case fully--See Order 41 rules 4, 20, 24 and 33.
+o Remand a case--See Order 41 rule 23 and 23 A. A court can also remand a case in the
+
+exercise of its inherent powers under Section 151 (b).
+
+o Frame issues etc.--See Order 41 rule 25. .
+o Take additional evidence--See Order 41 rules 27 and 28.
+</context>
+
+<context index="3">
+[Source 3 | CPC_text_part16
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q094
+Q: What is the legal consequence if the court fails to expressly record its leave for a compromise involving a minor?
+REF: If the court does not expressly record its leave, permission cannot be implied simply because a decree was passed on the basis of the compromise.
+ANS: **Summary:** If the court fails to expressly record its leave for a compromise involving a minor, the permission cannot be implied from the mere passing of a decree on the basis of the compromise (Source 2 | CPC_text_part14_of19.txt p.1), and the compromise may be set aside on the ground of the absence of leave (Source 3 | CPC_text_part14_of19.txt p.1). 
+
+**Detailed Analysis:** The requirement for the court to expressly record its leave is mandatory and enacted to protect the interests of minors (Source 2 | CPC_text_part14_of19.txt p.1). Where leave has not been expressly recorded, it cannot be implied simply because the court passed a decree based on the compromise (Source 2 | CPC_text_part14_of19.txt p.1). A compromise made without the court's sanction can be avoided or set aside on the ground of the absence of leave (Source 1 | CPC_text_part14_of19.txt p.1, Source 3 | CPC_text_part14_of19.txt p.1). Such a compromise may be set aside in review, through proceedings under Section 12(2), in revision, or via the court's exercise of its inherent powers to protect the minor's interest, provided it is shown that the minor has been prejudicially affected (Source 3 | CPC_text_part14_of19.txt p.1). If the decree is set aside, the suit will be revived from the stage it was at when compromised (Source 3 | CPC_text_part14_of19.txt p.1). (Note: An exception exists where the interests of a minor defendant and other adult defendants/guardians ad litem are identical and there is no allegation of improper conduct by the guardian, in which case leave was held unnecessary and the minor bound [Source 2 | CPC_text_part14_of19.txt p.1]).
+CTX: <context index="1">
+[Source 1 | CPC_text_part14_of19.txt | page 1]
+compromise was for the benefit of the minor(). The court need not in so many words state that the
+minor's benefit was considered, but the record should show that the leave has in fact been
+granted(m). There is no set form for the certificate(n). The court may make alterations in the form
+proposed(o). The leave may be obtained when the compromise is sought to be recorded
+in court(p). Ordinarily a compromise decreed with the leave of the court is binding on the minor(pa).
+The court can revoke the leave when it has been obtained by fraud(q), or on the basis of
+misapprehension of the correct facts(r). A minor can also challenge a compromise or withdrawal of
+a suit on the ground that it was fraudulent or that the guardian was grossly negligent/s), or that the
+court did not examine whether the arrangement was in the interest of the minor (sa), An agreement
+or compromise without the sanction of the court is not void(t), but it can be avoided by the
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part14_of19.txt | page 1]
+Leave of court. The leave of the court should be expressly recorded(e). This provision is
+enacted to protect the interests of the minors(f), and is mandatory(g). It is a matter for the exercise
+of discretion in each case(h). There should be a clear expression to the effect that the compromise
+is beneficial for the minor(i). The court can impose conditions (ia). Where leave has not been
+expressly
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q091
+Q: Does a decision on the issue of title in a suit for rent operate as res judicata for all successive periods?
+REF: Yes, where an issue of title is decided, it will operate as res judicata for all successive periods.
+ANS: **Summary:** Yes, where an issue of title is decided in a suit for rent, it will operate as res judicata for all successive periods ([Source 1 | CPC_text_part2_of19.txt | page 1]).
+CTX: <context index="1">
+[Source 1 | CPC_text_part2_of19.txt | page 1]
+substantially in issue (q), and refers to decisions on matters either not alleged and denied or
+admitted, and such matters will not be res judicata (r). Unnecessary and irrelevant allegations will
+be matters incidentally and collaterally in issue (s).
+In a suit for rent the question of title will be res judicata if the matter was directly and
+sustantially in issue (t). The question of existence or non-existence of the relationship of landlord
+and tenant or nature of tenancy is also res judicata (u).The issue of the right to receive rent for the
+period actually sued for will be res judicata but will not be res judicata in suit for rent for a
+subsequent period, (v). Where issue of title is decided it will be res judicata for all successive
+periods (w).Similarly where the right to maintenance has been adjudicated, the decision will be res
+judicata regarding such rightfo).
+Unlike Section 10 which prohibits the trial of the subsequent suit only if the entire matters in
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part2_of19.txt | page 1]
+subsequent suit are the same but they are not litigating under the same title, the decision in the
+former suit will not be res judicata in the subsequent suit (a).A verdict against a man suing in one
+capacity will not bar a suit in another distinct capacity, for he is a different person in law (b).For
+instance, a decision given in a former suit filed by person in his persona
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q026
+Q: What were the consequences and legal standing regarding the plea that the K.D.A. resolution violated Articles 11, 15, 16, and 40?
+REF: The court noted that Articles 11, 15, 16, and 40 deal respectively with the power to sanction, reject or revise a scheme, power of the authority to make regulations, rules to be published in the official Gazette, and the Zonal Plan Scheme. No law or rules were cited to show that the resolution required compulsory gazetting or notification, nor was it explained how it contravened these articles or modified Regulation No. 1972.
+ANS: **Summary:** The plea that the K.D.A. resolution violated Articles 11, 15, 16, and 40 failed because no law or rules were cited to show it had to be compulsorily gazetted or notified, nor was it explained how it contravened those articles or modified Regulation No. 1972 ((1998 M L D 1818.pdf p.8)).
+CTX: <context index="1">
+[Source 1 | CPC_text_part1_of19.txt | page 1]
+427; A 1932 B 206; A 1916 M 116; 7 MIA 476.
+(w) A 1959 SC 1383; 38 C 754.
+(x) P 1966 SC 357; A 1924 PC 216; 7 MIA 476; A 1954 C 591.
+(y) P 1978 L 1166; (1906) 1 KB 613.
+(z) P 1982 SC 367; P 1962 SC 357; 7 MIA 476; A 1915 PC 59; A 1924 PC 216; A 1954 C 591.
+(a) A 1957 C 617; A 1935 B 439.
+(b) P 1969 SC 14; P 1963 SC 627; P 1971 L 360; P 1963 D 422; Munir, Const, of Pak. P. 78.
+(c) P 1968 SC 270; P 1965 SC 90; P 1964 SC 97; P 1964 SC 64; P 1963 SC 564.
+(d) P 1963 SC 627.
+(e) P 1963 SC 627; P 1960 L 1073; A 1931 PC 248; A 1952 As 141.
+(f) A 1935 B 439.
+(g) 1 PR 1872 PC; 7 M 466 FB; A 1954 C 591.
+(h) P 2013 SC 641;P 1978 L 1166; P 1971 K 314; 2 IA 38; A 1937 L 572 See P 1969 SC 485; P
+1966 SC 357; P 1965 SC 236; P 1963 SC 627; A 1993 SC 1804; P 1993 L 732.
+(i) A 1956 C 66; A 1953 As 116.
+(j) P 1968 K 276; A 1954 C 615.
+(k) P 1958 PC 8; P 1968 K 276; A 1969 SC 783; A 1964 SC 1043; A 1960 SC 845; A 1958 SC
+816. See 1995 CLC 1039.
+(l) P 1972 SC 84.
+(m) P 1970 SC 415.
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part1_of19.txt | page 1]
+(v) P 1970 SC 185; 1996 CLC 1337; P 1950 L 42; A 1956 SC 140; See A 1939 FC 1.
+(w) P 1987 SC 145; PU 1976 SC 159; P 1972 SC 139; P 1955 FC 185; P 1970 SC 373; P 1966
+L 151; See P 1968 SC 125; P 1961 SC 349; P 1958 PC 109.
+(x) P 1975 K 26. See 1996 SCMR 218; P 1987 SC 145.
+</context>
+
+<context index="3">
+[Source 3 | CPC_text_part6_of19.txt | page 1]
+enumerated in Section {15 are 
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q098
+Q: What remedies or professional rights does a legal practitioner have regarding their fees and papers when handling a case?
+REF: An advocate is absolved of their obligation to a client if the whole or balance of fees is not paid, retains a lien on the client's papers until all fees are paid, and has the legal entitlement to sue for the recovery of their fees.
+ANS: **Summary:** An advocate is entitled to sue for the recovery of their fees, has a lien on the papers entrusted to them until all fees are paid, and is absolved of their obligation to the client if the whole or balance of the fees is not paid ([Source 1 | CPC_text_part7_of19.txt | page 1]).
+CTX: <context index="1">
+[Source 1 | CPC_text_part7_of19.txt | page 1]
+Rights and duties, Refusal by an Advocate to take a case for fair and proper fee offered
+will amount to professional misconduct(j). He can examine witnesses before tendering them in
+evidence(k), and is not liable in libel or slander in respect of words used in the course of judicial
+proceedings(!). He is absolved of obligation to his client on non-payment of the whole or balance
+of fees(m), and has a lien on the papers entrusted to him until all the fee is paid(n). He is entitled to
+sue for the recovery of his fees(o).
+
+A lawyer is an officer of the Court duty bound to assist the Court according to law(oa).
+On the other hand he is duty bound to attend to the client's interest diligently(p). Disciplinary
+action can be initiated on account of misconduct (pa). He must advise his client properly(q), and
+prior to associating himself with a charge or line of action on behalf of his client he must make
+(z) A1950N 110.
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part8_of19.txt | page 1]
+determine the correct fee payable and must allow time for making up the shortfall and in the event
+of the plaintiff failing to do so, can reject the plaint (qb). In this context, section 149 of the Code is
+(j) P 2016 SC 409; P 2010 L 197; 1979 LN 382; 1979 CLC 705. See 1980 CLC 570; 1980 L
+647.
+</context>
+
+<context index="3">
+[Source 3 | CPC_text_part7_of19.txt | page 1]
+behalf of the client(x). An Advocate only enjoys a qualif
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q047
+Q: What argument did the appellant's counsel raise regarding the receipt of the plaint by the court Ahlmad in the absence of the Civil Judge?
+REF: The appellant's counsel argued that since the Ahlmad of the Court received the plaint on 23-11-1967 in the absence of the Civil Judge and had also received plaints of other suits on the same date entered in the relevant register, it should be presumed under court practice that he had the authority to receive the plaint, making the suit within time.
+ANS: **Summary:** The appellant's counsel argued that since the Ahlmad had received the plaint on 23-11-1967 in the absence of the Civil Judge and entered it in the relevant register alongside other suits, there is a presumption that the Ahlmad had the authority to receive it according to the practice of the court, making the suit well within time (1994 C L C 2238.pdf p.2).
+CTX: <context index="1">
+[Source 1 | CPC_text_part7_of19.txt | page 1]
+A plaint can be presented in person or through a recognized agent or a pleader(i). There is
+nothing in the rule which requires that the plaint should be presented personally by the plaintiff or
+by an authorized agent or by a pleader(j). For purposes of limitation the date of presentation is the
+date of institution of the suit(k). A defect in the authority to present or non-compliance with a
+provision relating to presentation does not necessarily invalidate the proceedings(1). Irregularities
+or omissions in procedure of presentation of suits shall be allowed to be rectified and not visited by
+dismissal of the suit and registration of the suit amounts to condonation of irregularities (la). The
+cases are then to be distributed amongst the subordinate judges under Section 15 of the West
+Pakistan Civil Court Ordinance 1962. However, it is irregular to send a plaint by post(m). For
+purposes of Order 5 rule 1, the plaint shall be duly instituted when it has been registered(n). It
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part7_of19.txt | page 1]
+limitation it cannot be dismissed as time barred on the ground that it is deficiently stamped(ca).
+See notes under Section 149. The term ‘court’ means the presiding officer or an officer of the court
+authorized to receive plaints(d). The authorization need not be in writing (da). A person not
+authorized cannot receive plaints(e). Where a court admittedly possesses j
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q003
+Q: Does the failure to pay the proper court-fee affect the initial institution and overall validity of a civil suit?
+REF: No, the non-payment of a proper court-fee has no effect on the institution of a suit, and its validity is not affected by a deficit in the court-fee, as established by the Supreme Court.
+ANS: **Summary:** No, the non-payment or deficiency of proper court-fee does not affect the initial institution or the overall validity of a civil suit (1991CLC1826.pdf p.4).
+CTX: <context index="1">
+[Source 1 | CPC_text_part8_of19.txt | page 1]
+determination (qq) and allow the plaintiff to make good the deficiency (qa).
+Clause (c). There is a distinction between clauses (b) and (c). Whilst the former applies
+where the relief is undervalued, the later pre-supposes correct valuation. Therefore the two cannot
+be attracted at the same time. This ule is inapplicable where no court fee is payable (qab). Like
+clause (b), the provisions of clause (c) are mandatory in nature and also it will not be attracted
+where the plaint is insufficiently stamped or not stamped at all (gac). The initial duty of
+determining correct valuation and affixing proper court fee is that of the plaintiff (gad) but where
+the Court has determined the valuation, the same shall prevail(qae) even for purposes of the
+appeal(qaf). Where the court is of the view that the court fee stamps are insufficient, it should
+determine the correct fee payable and must allow time for making up the shortfall and in the event
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part8_of19.txt | page 1]
+where the first court had determined the amount of deficient court fee (na). The provisions of this
+tule are not applicable to applications for leave to sue in forma pauperis and as such the court is
+not bound to allow time for affixing proper court fee (0). Where however, after the order to make
+good the deficiency of court fee, the plaintiff applies for permission to continue the suit, as a
+pauper, the p
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q034
+Q: Can a District Judge legally act upon a request made by a Civil Judge to order the transfer of judicial proceedings?
+REF: Yes, a District Judge is perfectly right to act upon the request of a Civil Judge to order the transfer of proceedings, as a different view could lead to manifold complications including issues of limitation.
+ANS: **Summary:** Yes, a District Judge is perfectly right to act on the request of a Civil Judge to order the transfer of proceedings (1986 C L C 1451.pdf p.7).
+CTX: <context index="1">
+[Source 1 | CPC_text_part17_of19.txt | page 1]
+(2) On receiving the record and statement the High Court may order the
+Court either to proceed with the suit or to return the plaint for presentation to such
+other Court as it may in its order declare to be competent to take cognizance of the suit.
+
+THA.: K.
+
+Comp. Ref.: 1882, S. 646 A.
+
+7. Power of District Court to submit for revision proceedings had under
+mistake as to jurisdiction in small causes.--(1) Where it appears to a District
+
+' Court that a Court subordinate thereto has, by reason of erroneously holding a suit
+to be cognizable by a Court of Small Causes or not to be so cognizable failed to
+exercise a jurisdiction vested in it by law, or exercised a jurisdiction not so vested,
+the District Court may, and if required by a party shall, submit the record to the
+High Court with a statement of its reasons for considering the opinion of the
+subordinate Court with respect to the nature of the suit to be erroneous.
+
+(o) P1987L 510; P 1987 L 558; 15 B 376; 93 PLR 1902.
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part2_of19.txt | page 1]
+suitin') and it can be transferred for trial to an Additional District Judge (wa). Where during the
+pendency of an appeal before the High Court, the pecuniary jurisdiction of the District Judge is
+enhanced, the appeal is to be transferred to the District Judge for disposal (wb). Once a court is
+possessed of jurisdiction, its orders right or wrong are binding on the p
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q029
+Q: What is the maximum number of floors allowed in the approved construction plan for the commercial building on the disputed plot?
+REF: The approved plan for the construction of the commercial building on the said plot is strictly restricted to a basement, a ground floor, and five upper floors.
+ANS: **Summary:** The approved plan for the construction of the commercial building on the plot is restricted to a basement, ground floor, plus five upper floors (1998 M L D 1818.pdf p.4).
+CTX: <context index="1">
+[Source 1 | CPC_text_part18_of19.txt | page 1]
+‘t | | Respondent
+, (is see Nery yar k SERS ADS Raed
+| | Pa
+or ee a
+&
+| Confirmed, reversed or ae .
+i For what or amount | : |
+|
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part5_of19.txt | page 1]
+basis of a judicial decision which is res judicata between the parties (w). It may even be
+ascertained by the Court itself (x).
+</context>
+
+<context index="3">
+[Source 3 | CPC_text_part13_of19.txt | page 1]
+* not apply to objections raised under Section 47(z).
+</context>
+
+<context index="4">
+[Source 4 | 1998 M L D 1818.pdf | page 4]
+1990, categorically held that the order of his predecessor was not warranted and that the '
+No-Objection Certiﬁcate' granted to respondent No.9 was valid and subsisting.
+ 
+12. The approved plan for construction of commercial building on said plot is restricted
+to basement, ground plus ﬁve upper ﬂoors. The respondent has taken a plea that it could
+not be treated as ' highrise building'. The respondent has claimed that it is not ﬁrst
+commercial building to be constructed on Clifton Road and that the commercialisation
+of said road was decided in the year 1980. It is alleged that from Clifton Bridge to
+roundabout of "DOE TALWAR" already the followings commercial buildings have been
+constructed: (1) Bridge View, (2) Rimpa Constellation, (3) Parsa View, (4) Mehran
+Excellency, (5) Bridge Apartment, (6) Prince Complex, (7) P.S.O. House, (8) Glass
+Towers, (9) Clifton Broadway, (10) Chapp
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q008
+Q: Is a trial court justified in rejecting a plaint under Order VII Rule 11 of the CPC for court-fee deficiency without granting additional time when the plaintiff's conduct involves positive mala fide?
+REF: Yes, an order by a trial court rejecting a plaint without granting further time to make up a court-fee deficiency is held to be valid if the plaintiff appellants are suffering from positive mala fide.
+ANS: **Summary:** Yes, a trial court is justified in rejecting a plaint under Order VII, Rule 11 of the CPC without extending time when the plaintiff's conduct involves contumacy, gross negligence, or positive mala fide (Order VII, Rule 11 — CPC_text_part8_of19.txt p.1; 1983 C L C 944.pdf p.7).
+
+**Detailed Analysis:** While the court must ordinarily allow a reasonable time to make up a court-fee deficiency (CPC_text_part8_of19.txt p.1; 1983 C L C 944.pdf p.7), the opportunity to rectify a deficient court fee is not extended to a party guilty of contumacy, gross negligence, or positive mala fide (CPC_text_part8_of19.txt p.1; 1983 C L C 944.pdf p.7). Where such bad faith or lack of bona fides is established—such as paying an extremely unreasonable and ridiculous court fee based on an underassessed valuation—the rejection of the plaint becomes mandatory if the plaintiff fails to make good the deficiency within the fixed time (CPC_text_part8_of19.txt p.1; 1983 C L C 944.pdf p.6-7).
+CTX: <context index="1">
+[Source 1 | CPC_text_part8_of19.txt | page 1]
+allowed unless there is contumacy, gross negligence or positive mala fide (ta). The value fixed by
+the plaintiff is not final, and it is for the court to determine on which amount court fee must be
+paid, which can be refunded if the court ultimately decides that the court fee is excessive (u). The
+provisions of rule 11 are to be read with Section 149 ante (v). Apart from this rule, permission can
+be given under Section 151(w). Where the deficiency is made up in the time allowed, the suit will
+be deemed to have been instituted on the date the plaint was presented (x). See notes under Section
+149. The authority to extend time is provided by Section 149 and this discretion is to be exercised
+judicially (y), but the penalty for default is provided by rule 11 (z).
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part8_of19.txt | page 1]
+payable (za), and has given an opportunity to the plaintiff to make good the deficiency and he fails
+to do so within the time fixed by the court (a). For the purpose of determining the amount payable,
+if necessary, an issue may be framed (ab). Deficiency can also be allowed to be made good under
+Section 151 (b). Thereafter rejection is mandatory (c). This clause is inapplicable if the exact
+amount of court fee payable is not disputed and has not been affixed (ca). The court may however,
+enlarge such time from time to time under Section 148 (d), and this being within the discretio
+JUDGE: correct=correct grounded=True cite_ok=True halluc=False
+
+### gemini-3.5-flash-lite:q101
+Q: Can a civil court initiate an amendment of its own accord without an application from a party?
+REF: No, the court cannot suo motu direct an amendment. However, the court possesses inherent powers under Section 151 to allow amendments when necessary for determining the real matter in controversy.
+ANS: **Summary:** No, the court cannot *suo motu* direct an amendment (CPC_text_part8_of19.txt p.1).
+CTX: <context index="1">
+[Source 1 | CPC_text_part8_of19.txt | page 1]
+The court cannot suo motu direct amendment (b). An alternative is to apply for the withdrawal of
+the suit with permission to file a fresh suit on the same cause of action (ba). Under Order 14 rule 5
+amendment may be sought of the issues framed and under Order 1 rule 10 amendment for the
+striking out or adding of parties may be sought. This rule is not exhaustive of the powers of the
+court (c), which also has inherent power to allow amendment(d). See section 151.
+As in the case of Section 153, Order 7 rule 7 and Order 14 rule 5, the first part of the rule
+vests a discretion in the court, whereas the latter part is mandatory (da). If amendment is necessary
+for purposes of determining the real matter in controversy it should be allowed, provided the other
+party is not prejudiced (e). All rules of court are intended to secure the proper administration of
+justice and should be subordinate to that purpose, so that full power of amendment must be
+</context>
+
+<context index="2">
+[Source 2 | CPC_text_part7_of19.txt | page 1]
+allowed to set up a new case (g). This power can be exercised at any time during the pendency of
+such proceedings (h), as for instance, interim orders (ha), and even after the passage of the
+decree(i). Amendment should be allowed where it can be done without injustice to the other side,
+and where compensation would be an adequate relief, for the purpose of raising the real question
+between the parti
+JUDGE: correct=partially_correct grounded=True cite_ok=True halluc=False

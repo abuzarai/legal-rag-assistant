@@ -1,0 +1,98 @@
+{
+  "gemini-3.5-flash-lite:q019": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q081": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q088": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q037": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q104": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q092": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q094": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q091": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q026": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q098": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q047": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q003": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q034": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q029": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q008": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": true
+  },
+  "gemini-3.5-flash-lite:q101": {
+    "grounded": true,
+    "citation_accurate": true,
+    "hallucination": false,
+    "correct": false
+  }
+}

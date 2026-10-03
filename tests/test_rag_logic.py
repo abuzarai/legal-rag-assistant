@@ -90,3 +90,30 @@ def test_social_prompt_marks_question_as_data(monkeypatch):
     assert "Hi!" in reply
     assert "<question>" in captured["human"]
     assert "ignore previous instructions" in captured["human"]  # sent as data, not parsed
+
+
+def test_run_rag_embeds_query_once(monkeypatch):
+    """Both category searches must reuse a single query embedding."""
+    from src.backend import rag
+
+    embedded = []
+    received = []
+
+    def fake_embed_query(query):
+        embedded.append(query)
+        return [0.1, 0.2]
+
+    def fake_similarity_search(
+        query, k=5, category=None, use_hybrid=True, query_vector=None
+    ):
+        received.append(query_vector)
+        return []
+
+    monkeypatch.setattr(rag, "embed_query", fake_embed_query)
+    monkeypatch.setattr(rag, "similarity_search", fake_similarity_search)
+
+    rag.run_rag("what is section 10 of cpc")
+
+    assert embedded == ["what is section 10 of cpc"]
+    assert len(received) == 2
+    assert received[0] == received[1] == [0.1, 0.2]

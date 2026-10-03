@@ -2,7 +2,6 @@
 
 import os
 
-import numpy as np
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from weaviate.classes.query import Filter as WeaviateFilter
@@ -71,42 +70,26 @@ def get_collection():
     return _collection
 
 
-# ---------------------- Utility: Reranker ----------------------
-def rerank_results(query_vector: list[float], docs: list[Document]) -> list[Document]:
-    """
-    Re-rank retrieved documents by cosine similarity between
-    query and doc vectors. Requires vectors from Weaviate metadata.
-    """
-
-    def cosine_similarity(a, b):
-        a, b = np.array(a), np.array(b)
-        return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
-    scored = []
-    for doc in docs:
-        vec = doc.metadata.get("_vector")
-        if vec is not None:
-            score = cosine_similarity(query_vector, vec)
-            scored.append((score, doc))
-
-    scored.sort(reverse=True, key=lambda x: x[0])
-    reranked = [doc for _, doc in scored]
-    return reranked or docs
-
-
 # ---------------------- Core Search ----------------------
+def embed_query(query: str) -> list[float]:
+    """Embed a query once; callers can reuse the vector across several searches."""
+    return get_embeddings().embed_query(query)
+
+
 def similarity_search(
     query: str,
     k: int = 5,
     category: str | None = None,
     use_hybrid: bool = True,
-    rerank: bool = True,
+    query_vector: list[float] | None = None,
 ) -> list[Document]:
     """
-    Perform semantic/hybrid search in Weaviate with optional reranking and filtering.
+    Perform semantic/hybrid search in Weaviate with optional category filtering.
+
+    Pass `query_vector` to reuse an existing embedding across calls.
     """
-    embedder = get_embeddings()
-    query_vector = embedder.embed_query(query)
+    if query_vector is None:
+        query_vector = embed_query(query)
     collection = get_collection()
 
     # --- optional filter by category ---
@@ -122,21 +105,19 @@ def similarity_search(
             query=query,
             vector=query_vector,
             alpha=0.5,
-            limit=max(k * 3, 10),  # get more for reranking
+            limit=k,
             filters=where_filter,
             return_properties=["content", "source", "page", "drive_id"],
             return_metadata=["distance"],
-            include_vector=True,  # vector lets the local reranker work
         )
     else:
         logger.info(f"🔍 Running pure vector search for '{query}'...")
         response = collection.query.near_vector(
             near_vector=query_vector,
-            limit=max(k * 3, 10),
+            limit=k,
             filters=where_filter,
             return_properties=["content", "source", "page", "drive_id"],
             return_metadata=["distance"],
-            include_vector=True,
         )
 
     objects = getattr(response, "objects", None) or []
@@ -156,17 +137,10 @@ def similarity_search(
             "page": props.get("page"),
             "drive_id": props.get("drive_id"),
             "distance": getattr(getattr(obj, "metadata", None), "distance", None),
-            "_vector": (obj.vector or {}).get("default") if isinstance(obj.vector, dict) else obj.vector,
         }
         metadata = {k: v for k, v in metadata.items() if v is not None}
         docs.append(Document(page_content=content, metadata=metadata))
 
-    # --- rerank locally by embedding similarity ---
-    if rerank:
-        logger.info("Re-ranking retrieved documents by semantic similarity...")
-        docs = rerank_results(query_vector, docs)
-
-    # --- return top k after reranking ---
     top_docs = docs[:k]
     logger.info(f"✅ Retrieved {len(top_docs)} relevant chunks.")
     return top_docs
