@@ -284,6 +284,20 @@ uv run pytest -v
 
 ---
 
+## Evaluation
+
+`evals/` is a measuring stick for the RAG service — not part of the deployed
+product. It answers three questions: does retrieval find the right passages,
+does generation answer correctly and stay faithful, and at what cost and
+speed? It manufactures a labelled eval set from the corpus itself (107
+questions with gold chunks), then scores retrieval, generation quality
+(LLM-judged), latency, and list-price cost.
+
+Full details: [evals/README.md](evals/README.md) · Results from the current
+run: [evals/REPORT.md](evals/REPORT.md)
+
+---
+
 ## Deployment
 
 The service runs as a container in the Insafdaar compose stack. Key configuration:
@@ -317,6 +331,7 @@ legal-rag-assistant/
 │       ├── state_manager.py       # Ingestion state (file backend)
 │       ├── to_json.py             # Per-document JSON snapshots
 │       └── embedder.py            # Chunking, embedding, Weaviate upsert
+├── evals/                       # Evaluation harness (see evals/README.md)
 ├── tests/
 │   ├── test_rag_api.py            # FastAPI TestClient tests
 │   ├── test_rag_logic.py          # RAG pipeline logic tests
